@@ -3,6 +3,7 @@ p {
 }
 body {
     height: 96vh;
+    margin: 0;
 }
 
 #root {
