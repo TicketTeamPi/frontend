@@ -9,12 +9,22 @@ export type TicketResponse = {
   title: string;
   description: string;
   status: string;
+  sector: {
+    name: string;
+    color: string;
+  };
+  createdAt: string;
   responsibleId: string;
 };
 
-export interface Board<T extends TicketResponse = TicketResponse>
+export interface Call<T extends TicketResponse = TicketResponse>
   extends Omit<TicketResponse, "responsibleId"> {
-  ticket?: Board<T>[];
+  call?: Call<T>[];
 }
 
-export type InternalBoard<T extends Board = Board> = T;
+export type BoardColumn<T extends TicketResponse = TicketResponse> = Record<
+  string,
+  Call<T>[]
+>;
+
+export type InternalBoard<T extends Call = Call> = T;

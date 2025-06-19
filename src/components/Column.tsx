@@ -9,9 +9,10 @@ import {
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import clsx from "clsx";
+import type { Call, TicketResponse } from "src/types/type";
 
 const useStyles = makeStyles((theme) => ({
-  boardCard: {
+  callCard: {
     width: "380px",
     display: "flex",
     maxHeight: "100%",
@@ -24,15 +25,15 @@ const useStyles = makeStyles((theme) => ({
       width: "300px",
     },
   },
-  boardHeader: {
+  callHeader: {
     padding: theme.spacing(2),
     alignItems: "center",
     justifyContent: "space-between",
   },
-  boardHeaderButton: {
+  callHeaderButton: {
     marginRight: "-12px",
   },
-  boardButton: {
+  callButton: {
     padding: theme.spacing(2),
     justifyContent: "center",
   },
@@ -61,34 +62,36 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(1),
   },
 }));
-
-export const Board: React.FC = ({ board }: any) => {
+interface ColumnProps {
+  ticket: Partial<TicketResponse>;
+}
+export const Column: React.FC<ColumnProps> = ({ ticket }) => {
   const classes = useStyles();
   return (
     <Card
       className={clsx(classes.cardRoot, {
-        waitingBoard: board.status === "Waiting",
-        successBoard: board.status === "Approved",
+        waitingBoard: ticket.status === "Waiting",
+        successBoard: ticket.status === "Approved",
       })}
       variant="outlined"
-      style={{ borderLeft: `5px solid ${board.category.color}` }}
+      style={{ borderLeft: `5px solid ${ticket.sector?.color}` }}
     >
       <div className={classes.details}>
         <CardContent className={classes.content}>
           <Typography component="h5" variant="h6">
-            {board.title}
+            {ticket.title}
           </Typography>
           <Grid item xs={12}>
             <Box component="small" m={1}>
-              <Typography variant="body2">{board.start}</Typography>
+              <Typography variant="body2">{ticket.createdAt}</Typography>
             </Box>
           </Grid>
           <Grid item xs={12} className={classes.bottomBox}>
-            {board.category.title && (
+            {ticket.sector?.name && (
               <Chip
                 size="small"
-                label={board.category.title}
-                style={{ backgroundColor: board.category.color, color: "#fff" }}
+                label={ticket.sector.name}
+                style={{ backgroundColor: ticket.sector.color, color: "#fff" }}
               />
             )}
           </Grid>

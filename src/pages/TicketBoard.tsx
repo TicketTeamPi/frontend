@@ -1,15 +1,13 @@
 import React, { useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { Divider, Grid, Paper } from "@material-ui/core";
-import { BoardsList } from "../components/BoardList";
-import { BoardHeader } from "../components/BoardHeader";
-import { BoardFooter } from "../components/BoardFooter";
+import { ColumnList } from "../components/ColumnList";
+import { ColumnHeader } from "../components/ColumnHeader";
+import { ColumnFooter } from "../components/ColumnFooter";
 import defaultTaskList from "../../Tasks";
 import axios from "axios";
 import { Header } from "../components/Header";
 
-const url = "/db.json";
-console.log(defaultTaskList);
 const useStyles = makeStyles((theme) => ({
   root: {
     padding: theme.spacing(2),
@@ -17,18 +15,19 @@ const useStyles = makeStyles((theme) => ({
     flex: "1 1 auto",
     height: "100%",
   },
-  boardsWrap: {
+  callWrap: {
     display: "flex",
     flex: "1 1 auto",
     overflowX: "auto",
     overflowY: "hidden",
     height: "100%",
   },
-  boardsContent: {
+  callContent: {
     display: "flex",
     paddingTop: "24px",
     paddingBottom: "24px",
     height: "100%",
+    alignItems: "flex-start",
   },
   boardCard: {
     width: "380px",
@@ -59,21 +58,22 @@ const TicketBoard = () => {
     <>
       <Header />
       <Grid container className={classes.root} spacing={3}>
-        <Grid container className={classes.boardsWrap}>
-          <Grid className={classes.boardsContent}>
-            {defaultTaskList.board &&
-              defaultTaskList.board.map((board) => {
+        <Grid container className={classes.callWrap}>
+          <Grid className={classes.callContent}>
+            {defaultTaskList &&
+              Object.entries(defaultTaskList).map(([title, calls], i) => {
                 return (
                   <Paper
-                    key={board.id}
+                    key={`column -${i} ${[title]}`}
                     elevation={3}
                     className={classes.boardCard}
                   >
-                    <BoardHeader title={board.title} />
+                    <ColumnHeader title={title} />
                     <Divider />
-                    <BoardsList boards={board.tasks} />
+                    <ColumnList calls={calls} />
                     <Divider className={classes.divider} />
-                    <BoardFooter />
+
+                    <ColumnFooter />
                   </Paper>
                 );
               })}

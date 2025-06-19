@@ -9,13 +9,13 @@ import { makeStyles } from "@material-ui/core/styles";
 import { InputAdd } from "./InputAdd";
 
 const useStyles = makeStyles((theme) => ({
-  boardButton: {
+  columnButton: {
     padding: theme.spacing(2),
     justifyContent: "center",
   },
 }));
 
-export const BoardFooter = () => {
+export const ColumnFooter = () => {
   const classes = useStyles();
   const [showInput, setShowInput] = useState(false);
 
@@ -38,7 +38,7 @@ export const BoardFooter = () => {
     );
   } else {
     return (
-      <form className={classes.boardButton}>
+      <form className={classes.columnButton}>
         <Button color="primary">Add</Button>
       </form>
     );

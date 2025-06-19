@@ -1,21 +1,21 @@
 p {
-    font-family: "Roboto", "Helvetica", "Arial", sans-serif;;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
 }
 body {
-    height: 96vh;
-    margin: 0;
+  height: inherit;
+  margin: 0;
 }
 
 #root {
-    height: inherit;
+  height: inherit;
 }
 .text-main-color {
-    color: rgba(0, 0, 0, 0.38);
-    font-weight: 300;
-    text-align: center;
+  color: rgba(0, 0, 0, 0.38);
+  font-weight: 300;
+  text-align: center;
 }
 .logo-menu {
-    width: 70px;
-    border-radius: 40px;
-    opacity: 0.5;
+  width: 70px;
+  border-radius: 40px;
+  opacity: 0.5;
 }
