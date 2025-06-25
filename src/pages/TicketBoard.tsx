@@ -6,11 +6,9 @@ import { ColumnHeader } from "../components/ColumnHeader";
 import { ColumnFooter } from "../components/ColumnFooter";
 import defaultTaskList from "../../Tasks";
 import axios from "axios";
-import { Header } from "../components/Header";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    padding: theme.spacing(2),
     display: "flex",
     flex: "1 1 auto",
     height: "100%",
@@ -20,7 +18,8 @@ const useStyles = makeStyles((theme) => ({
     flex: "1 1 auto",
     overflowX: "auto",
     overflowY: "hidden",
-    height: "100%",
+    height: "93.6vh",
+    scrollbarWidth: "thin",
   },
   callContent: {
     display: "flex",
@@ -51,13 +50,12 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const TicketBoard = () => {
+const TicketBoard: React.FC = () => {
   const classes = useStyles();
 
   return (
     <>
-      <Header />
-      <Grid container className={classes.root} spacing={3}>
+      <Grid container className={classes.root}>
         <Grid container className={classes.callWrap}>
           <Grid className={classes.callContent}>
             {defaultTaskList &&

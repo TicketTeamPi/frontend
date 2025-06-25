@@ -30,9 +30,6 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "center",
     justifyContent: "space-between",
   },
-  callHeaderButton: {
-    marginRight: "-12px",
-  },
   callButton: {
     padding: theme.spacing(2),
     justifyContent: "center",
