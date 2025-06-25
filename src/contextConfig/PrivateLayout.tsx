@@ -17,7 +17,7 @@ const PrivateRoute: React.FC<PropsWithChildren> = ({ children }) => {
       title: "Tickets",
     },
     {
-      segment: "allTickets",
+      segment: "ticket",
       title: "Todos os tickets",
       icon: <DashboardOutlinedIcon />,
     },
@@ -57,7 +57,12 @@ const PrivateRoute: React.FC<PropsWithChildren> = ({ children }) => {
         homeUrl: "/toolpad/core/introduction",
       }}
     >
-      <DashboardLayout>
+      <DashboardLayout
+        slots={{
+          toolbarActions: CustomToolbarActions,
+          sidebarFooter: SidebarFooterAccount,
+        }}
+      >
         <TicketBoard />
       </DashboardLayout>
     </AppProvider>

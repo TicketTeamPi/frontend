@@ -9,7 +9,7 @@ import {
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import clsx from "clsx";
-import type { Call, TicketResponse } from "src/types/type";
+import type { TicketResponse } from "src/types/type";
 
 const useStyles = makeStyles((theme) => ({
   callCard: {
@@ -37,7 +37,6 @@ const useStyles = makeStyles((theme) => ({
   divider: {
     marginTop: theme.spacing(2),
   },
-
   cardRoot: {
     margin: theme.spacing(2),
     marginBottom: 20,

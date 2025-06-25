@@ -63,7 +63,7 @@ const TicketBoard: React.FC = () => {
                 return (
                   <Paper
                     key={`column -${i} ${[title]}`}
-                    elevation={3}
+                    elevation={1}
                     className={classes.boardCard}
                   >
                     <ColumnHeader title={title} />
