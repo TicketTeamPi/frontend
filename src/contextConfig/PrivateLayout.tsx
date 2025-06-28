@@ -1,12 +1,12 @@
 import React, { type PropsWithChildren } from "react";
 import {
   DashboardLayout,
-  AppProvider,
   type AccountPreviewProps,
   AccountPreview,
   Account,
   type SidebarFooterProps,
   ThemeSwitcher,
+  type Navigation,
 } from "@toolpad/core";
 import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
 import TicketBoard from "../pages/TicketBoard";
@@ -19,7 +19,10 @@ import {
 } from "@material-ui/icons";
 import Logout from "@mui/icons-material/Logout";
 import { Divider, Stack } from "@mui/material";
-const navigation = [
+import { ReactRouterAppProvider } from "@toolpad/core/react-router";
+import { Outlet } from "react-router";
+
+const navigation: Navigation = [
   {
     kind: "header",
     title: "Tickets",
@@ -107,7 +110,7 @@ const PrivateRoute: React.FC<PropsWithChildren> = () => {
   );
 
   return (
-    <AppProvider
+    <ReactRouterAppProvider
       navigation={navigation}
       session={session}
       authentication={authentication}
@@ -120,7 +123,7 @@ const PrivateRoute: React.FC<PropsWithChildren> = () => {
           />
         ),
         title: "Ticket Tool",
-        homeUrl: "/toolpad/core/introduction",
+        homeUrl: "/ticket",
       }}
     >
       <DashboardLayout
@@ -129,9 +132,9 @@ const PrivateRoute: React.FC<PropsWithChildren> = () => {
           toolbarActions: CustomToolbarActions,
         }}
       >
-        <TicketBoard />
+        <Outlet />
       </DashboardLayout>
-    </AppProvider>
+    </ReactRouterAppProvider>
   );
 };
 

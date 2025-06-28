@@ -11,7 +11,10 @@ export const AppRoutes = () => {
         <Route index element={<Login />} />
         <Route path="/login" element={<Login />} />
         <Route path="/sign" element={<Register />} />
-        <Route path="/ticket" element={<PrivateLayout />} />
+      </Route>
+      <Route path="/" element={<PrivateLayout />}>
+        <Route path="/ticket" index element={<TicketBoard />} />
+        <Route path="/ticketSector" element={<TicketBoard />} />
       </Route>
     </Routes>
   );
