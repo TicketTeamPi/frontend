@@ -19,3 +19,42 @@ body {
   border-radius: 40px;
   opacity: 0.5;
 }
+
+[data-draggable] {
+  cursor: grab;
+}
+
+[data-drop-target-for] {
+  transition: background-color 0.15s ease-in-out;
+}
+
+[data-drop-target-for].drop-hovered {
+  background-color: rgba(33, 150, 243, 0.08);
+  border-radius: 8px;
+}
+[data-rbd-drag-handle-context-id] {
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.drop-hovered {
+  outline-offset: -4px;
+}
+.ghost-preview {
+  opacity: 0.5;
+  transform: scale(0.98);
+  pointer-events: none;
+}
+.dragging {
+  opacity: 0;
+  visibility: hidden;
+}
+.ghost-card-placeholder {
+  height: 100px;
+  margin: 16px;
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  background-color: #f3f3f3;
+  opacity: 0.5;
+  pointer-events: none;
+  transition: all 0.2s ease;
+}

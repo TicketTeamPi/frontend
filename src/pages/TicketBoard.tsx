@@ -1,85 +1,89 @@
-import React, { useEffect } from "react";
+// src/pages/TicketBoard.tsx
+"use client";
+import React, { useEffect, useRef, useState } from "react";
+import { Grid, Paper, Divider } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import { Divider, Grid, Paper } from "@material-ui/core";
-import { ColumnList } from "../components/ColumnList";
+import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
+
+import defaultTasks from "../../Tasks";
+import type { BoardColumn, Ticket } from "src/types/type";
 import { ColumnHeader } from "../components/ColumnHeader";
+import { ColumnList } from "../components/ColumnList";
 import { ColumnFooter } from "../components/ColumnFooter";
-import defaultTaskList from "../../Tasks";
-import axios from "axios";
 
 const useStyles = makeStyles((theme) => ({
-  root: {
-    display: "flex",
-    flex: "1 1 auto",
-    height: "100%",
-  },
+  root: { display: "flex", height: "100%" },
   callWrap: {
     display: "flex",
     flex: "1 1 auto",
+    flexWrap: "nowrap",
     overflowX: "auto",
     overflowY: "hidden",
     height: "93.6vh",
     scrollbarWidth: "thin",
   },
-  callContent: {
-    display: "flex",
-    paddingTop: "24px",
-    paddingBottom: "24px",
-    height: "100%",
-    alignItems: "flex-start",
-  },
   boardCard: {
-    width: "380px",
+    width: 380,
+    margin: "0 8px",
+    flexShrink: 0,
     display: "flex",
-    maxHeight: "100%",
-    overflowX: "hidden",
-    overflowY: "hidden",
-    marginLeft: "8px",
-    marginRight: "8px",
+    height: "99%",
     flexDirection: "column",
-    [theme.breakpoints.down("sm")]: {
-      width: "300px",
-    },
+    [theme.breakpoints.down("sm")]: { width: 300 },
   },
-  boardButton: {
-    padding: theme.spacing(2),
-    justifyContent: "center",
-  },
-  divider: {
-    marginTop: theme.spacing(2),
-  },
+  divider: { marginTop: theme.spacing(2) },
 }));
-
-const TicketBoard: React.FC = () => {
+export const TicketBoard: React.FC = () => {
   const classes = useStyles();
+  // agora é um array de colunas
+  const [columns, setColumns] = useState<BoardColumn[]>(defaultTasks.data);
 
+  const handleTicketDrop = (
+    ticketId: string,
+    fromColumnId: string,
+    toColumnId: string,
+    toIndex: number
+  ) => {
+    if (fromColumnId === toColumnId) return;
+    setColumns((cols) =>
+      cols.map((col) => {
+        // remove de origem
+        if (col.id === fromColumnId) {
+          return {
+            ...col,
+            tickets: col.tickets.filter((t) => t.id !== ticketId),
+          };
+        }
+        // adiciona em destino
+        if (col.id === toColumnId) {
+          const sourceCol = cols.find((c) => c.id === fromColumnId);
+          const moved = sourceCol?.tickets.find((t) => t.id === ticketId);
+          if (!moved) return col;
+          const newTickets = [...col.tickets];
+          newTickets.splice(toIndex, 0, moved);
+          return { ...col, tickets: newTickets };
+        }
+        return col;
+      })
+    );
+  };
   return (
-    <>
-      <Grid container className={classes.root}>
-        <Grid container className={classes.callWrap}>
-          <Grid className={classes.callContent}>
-            {defaultTaskList &&
-              Object.entries(defaultTaskList).map(([title, calls], i) => {
-                return (
-                  <Paper
-                    key={`column -${i} ${[title]}`}
-                    elevation={1}
-                    className={classes.boardCard}
-                  >
-                    <ColumnHeader title={title} />
-                    <Divider />
-                    <ColumnList calls={calls} />
-                    <Divider className={classes.divider} />
-
-                    <ColumnFooter />
-                  </Paper>
-                );
-              })}
-          </Grid>
-        </Grid>
+    <Grid container className={classes.root}>
+      <Grid container wrap="nowrap" className={classes.callWrap}>
+        {columns.map((col) => (
+          <Paper key={col.id} elevation={1} className={classes.boardCard}>
+            <ColumnHeader title={col.name} />
+            <Divider />
+            <ColumnList
+              calls={col.tickets}
+              onTicketDrop={handleTicketDrop}
+              columnKey={col.id}
+            />
+            <Divider className={classes.divider} />
+            <ColumnFooter />
+          </Paper>
+        ))}
       </Grid>
-    </>
+    </Grid>
   );
 };
-
-export default TicketBoard;

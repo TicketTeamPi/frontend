@@ -1,32 +1,20 @@
-import React, { type PropsWithChildren } from "react";
+import React, { useState, useMemo } from "react";
 import {
   DashboardLayout,
-  type AccountPreviewProps,
-  AccountPreview,
   Account,
-  type SidebarFooterProps,
   ThemeSwitcher,
   type Navigation,
+  type SidebarFooterProps,
 } from "@toolpad/core";
 import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
-import TicketBoard from "../pages/TicketBoard";
-import {
-  CallReceivedOutlined,
-  FormatIndentIncreaseOutlined,
-  ImportContactsOutlined,
-  RouterOutlined,
-  PeopleOutlineOutlined,
-} from "@material-ui/icons";
+import { PeopleOutlineOutlined } from "@material-ui/icons";
 import Logout from "@mui/icons-material/Logout";
 import { Divider, Stack } from "@mui/material";
 import { ReactRouterAppProvider } from "@toolpad/core/react-router";
 import { Outlet } from "react-router";
 
 const navigation: Navigation = [
-  {
-    kind: "header",
-    title: "Tickets",
-  },
+  { kind: "header", title: "Tickets" },
   {
     segment: "ticket",
     title: "Todos os tickets",
@@ -42,16 +30,14 @@ const navigation: Navigation = [
     title: "Meus tickets",
     icon: <DashboardOutlinedIcon />,
   },
-  {
-    kind: "header",
-    title: "Usuários",
-  },
+  { kind: "header", title: "Usuários" },
   {
     segment: "lord-of-the-rings",
     title: "Usuários",
     icon: <PeopleOutlineOutlined />,
   },
 ];
+
 const demoSession = {
   user: {
     name: "Bharat Kashyap",
@@ -60,13 +46,12 @@ const demoSession = {
   },
 };
 
-const CustomToolbarActions: React.FC = () => {
-  return (
-    <Stack direction="row" alignItems="center">
-      <ThemeSwitcher />
-    </Stack>
-  );
-};
+const CustomToolbarActions: React.FC = () => (
+  <Stack direction="row" alignItems="center">
+    <ThemeSwitcher />
+  </Stack>
+);
+
 const SidebarFooterAccount: React.FC<SidebarFooterProps> = ({ mini }) => (
   <Stack direction="column" p={0}>
     <Divider />
@@ -90,20 +75,21 @@ const SidebarFooterAccount: React.FC<SidebarFooterProps> = ({ mini }) => (
   </Stack>
 );
 
-const PrivateRoute: React.FC<PropsWithChildren> = () => {
-  const [session, setSession] = React.useState<typeof demoSession | null>(
+const PrivateRoute: React.FC = () => {
+  const [session, setSession] = useState<typeof demoSession | null>(
     demoSession
   );
 
-  const authentication = React.useMemo(
+  const authentication = useMemo(
     () => ({
       signIn: async () => {
         setSession(demoSession);
         return demoSession;
       },
       signOut: async () => {
-        setSession(null);
         window.location.replace("/login");
+
+        setSession(null);
       },
     }),
     []
