@@ -58,19 +58,14 @@ const Users: React.FC = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
 
-  const currentUserJson = localStorage.getItem("currentUser");
-  const currentUser: User | null = currentUserJson
-    ? JSON.parse(currentUserJson)
-    : null;
-  const isAdmin = currentUser?.isAdmin === 1;
+  const currentUserJson = localStorage.getItem("currentUser"); 
 
+  let isAdmin = true
   useEffect(() => {
-    if (isAdmin) {
       api
         .get<{ data: Sector[] }>("/sectors")
         .then((res) => setSectors(res.data.data))
         .catch(() => setSectors([]));
-    }
     api
       .get<{ data: User[] }>("/users")
       .then((res) => setUsers(res.data.data))
@@ -116,7 +111,11 @@ const Users: React.FC = () => {
     setDeleteDialogOpen(false);
 
     if (deleteTargetId) {
-      await api.delete(`/users/${deleteTargetId}`);
+      await api.patch(`/users/change-status/${deleteTargetId}`).then((res) =>{
+        if(res.status.valueOf() === 204){
+          console.log("atualizado com sucesso")
+        }
+      });
       refreshUsers();
     }
     setDeleteTargetId(null);
@@ -132,6 +131,7 @@ const Users: React.FC = () => {
       const payload: any = {
         name: formData.name,
         email: formData.email,
+        password: formData.password,
         isAdmin: formData.isAdmin,
         sectorId: formData.sectorId,
       };
@@ -140,7 +140,12 @@ const Users: React.FC = () => {
       }
 
       if (editingUser) {
-        await api.put(`/users/${editingUser.id}`, payload);
+        const payloadUpdate: any = {
+          userId: editingUser.id,
+          name: formData.name,
+          sectorId: formData.sectorId,
+      };
+        await api.put(`users/updateUser`, payloadUpdate);
       } else {
         await api.post(`/users`, payload);
       }

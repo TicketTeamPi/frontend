@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   DashboardLayout,
   Account,
@@ -13,6 +13,9 @@ import { Divider, Stack } from "@mui/material";
 import { ReactRouterAppProvider } from "@toolpad/core/react-router";
 import { Outlet } from "react-router";
 import ApartmentIcon from "@mui/icons-material/Apartment";
+import { useAppSelector } from "../store/hook";
+import { api } from "../utils/API";
+import type { MeResponse } from "src/types/type";
 const navigation: Navigation = [
   { kind: "header", title: "Tickets" },
   {
@@ -38,12 +41,7 @@ const navigation: Navigation = [
   },
 ];
 
-const demoSession = {
-  user: {
-    name: "Bharat Kashyap",
-    email: "bharatkashyap@outlook.com",
-  },
-};
+
 
 const CustomToolbarActions: React.FC = () => (
   <Stack direction="row" alignItems="center">
@@ -73,22 +71,27 @@ const SidebarFooterAccount: React.FC<SidebarFooterProps> = ({ mini }) => (
     />
   </Stack>
 );
-
+interface MeResponseSession extends Omit<MeResponse['data'], 'isAdmin'> { }
 const PrivateRoute: React.FC = () => {
-  const [session, setSession] = useState<typeof demoSession | null>(
-    demoSession
-  );
-
+  const [users, setUser] = useState<MeResponseSession>()
+  const userRef = useAppSelector((state) => state.user )
+  useEffect(() => {
+    console.log(userRef)
+  }, [userRef])
+  const session = {
+    user: {
+     ...users
+    },
+  };
   const authentication = useMemo(
     () => ({
       signIn: async () => {
-        setSession(demoSession);
-        return demoSession;
+        return;
       },
       signOut: async () => {
+        await api.delete('/logout')
         window.location.replace("/login");
 
-        setSession(null);
       },
     }),
     []

@@ -10,6 +10,7 @@ import {
 import { Alert } from "@mui/material";
 import type { RegisterData } from "src/types/type";
 import { authService } from "../services/authService";
+import { api } from "../utils/API";
 
 const Register: React.FC = () => {
   const [success, setSuccess] = useState<boolean>(false);
@@ -26,7 +27,11 @@ const Register: React.FC = () => {
   });
 
   const handleSubmit = () => {
-    console.log(form);
+    api.post("/register", {...form}).then((res) => {
+      if(res.status.valueOf() === 200){
+        setMessage('empresa cadastrada com sucesso!')
+      }
+    })
   };
 
   return (
@@ -35,13 +40,12 @@ const Register: React.FC = () => {
         gap={2}
         display={"grid"}
         alignContent={"center"}
-        minHeight={"96vh"}
-        maxHeight={"96vh"}
+        // minHeight={"96vh"}
+        // maxHeight={"100vh"}
       >
-        {form.password && (
+        {message === "empresa cadastrada com sucesso!" &&(
           <Alert
             style={{
-              display: "",
               textAlign: "center",
               justifySelf: "center",
               marginTop: "10px",

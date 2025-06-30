@@ -53,7 +53,7 @@ const Sectors: React.FC = () => {
       .get<{ data: Sector[] }>("/sectors")
       .then((res) => setSectors(res.data.data))
       .catch((err) => setError(err.message || "Erro ao carregar setores"))
-      .finally(() => setLoading(false));
+      .finally(() => setLoading(false))
   }, []);
 
   const refresh = () => {
@@ -85,7 +85,7 @@ const Sectors: React.FC = () => {
 
   const handleDeleteConfirm = async () => {
     if (deleteTargetId) {
-      await api.delete(`/sectors/${deleteTargetId}`);
+      await api.delete(`/sectors/change-status/${deleteTargetId}`);
       refresh();
     }
     setDeleteDialogOpen(false);
@@ -111,7 +111,6 @@ const Sectors: React.FC = () => {
     refresh();
     setModalOpen(false);
   };
-
   return (
     <Box>
       <Box display="flex" justifyContent="space-between" mb={2}>
@@ -137,7 +136,7 @@ const Sectors: React.FC = () => {
               <TableCell>Nome</TableCell>
               <TableCell>Descrição</TableCell>
               <TableCell>Cor</TableCell>
-              {isAdmin && <TableCell>Ações</TableCell>}
+              {/* isAdmin && */ <TableCell>Ações</TableCell>}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -147,15 +146,15 @@ const Sectors: React.FC = () => {
                 <TableCell>{sec.description}</TableCell>
                 <TableCell>
                   <Box
-                    width={24}
-                    height={24}
                     style={{
                       backgroundColor: sec.color ?? "#000000",
-                      borderRadius: 4,
+                      height: '14px',
+                      width: '14px',
+                      borderRadius: 20,
                     }}
                   />
                 </TableCell>
-                {isAdmin && (
+                {/* isAdmin && */ (
                   <TableCell>
                     <Button size="small" onClick={() => openEditModal(sec)}>
                       Editar

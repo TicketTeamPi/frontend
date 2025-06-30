@@ -34,7 +34,7 @@ const useStyles = makeStyles((theme) => ({
 
 export const TicketBoard: React.FC = () => {
   const classes = useStyles();
-  const [columns, setColumns] = useState<BoardColumn[]>([]);
+  const [columns, setColumns] = useState<BoardColumn[]>([defaultTasks]);
   const [modalOpen, setModalOpen] = useState(false);
   const [activeColumn, setActiveColumn] = useState<string>("");
 
@@ -124,7 +124,7 @@ export const TicketBoard: React.FC = () => {
   return (
     <Grid container className={classes.root}>
       <Grid container wrap="nowrap" className={classes.callWrap}>
-        {defaultTasks.data.map((col) => (
+        {columns.map((col) => (
           <Paper key={col.id} elevation={1} className={classes.boardCard}>
             <ColumnHeader title={col.name} />
             <Divider />

@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import { Alert, Button, fabClasses, Grid, Paper, TextField, Typography } from "@mui/material";
 import type { LoginData, LoginResponse } from "../types/type";
+import { useNavigate } from "react-router";
 import { authService } from "../services/authService";
 import type { AxiosResponse } from "axios";
+import { useAppDispatch } from "../store/hook";
+import { login } from "../store/userReducer";
 
 const Login: React.FC = () => {
   const [error, setError] = useState<boolean>(false)
@@ -11,18 +14,25 @@ const Login: React.FC = () => {
     email: '',
     password: ''
   })
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const handleSubmit = () => {
     authService.login(form)
-      .then((response:AxiosResponse<LoginResponse>) => {
+      .then((response: AxiosResponse<LoginResponse>) => {
         const token = response.data.data.accesstoken.token
-  
+        if (response.data) {
+          
+          console.log("login",  response.data)
+          dispatch(login(response.data.data))
+        }
+
         localStorage.setItem('auth-token', token)
         setError(false)
-        window.location.replace("/ticket");
+        navigate("/ticket");
       })
       .catch((error: any) => {
-        setMessage('Ocorreu um erro ao fazer login') 
+        setMessage('Ocorreu um erro ao fazer login')
         setError(true)
       })
   }
@@ -31,11 +41,12 @@ const Login: React.FC = () => {
     <Grid gap={2} display={"grid"} alignContent={"center"} minHeight={"96vh"}>
       {error && (
         <Alert severity="error"
-          style={{ 
-          display: "",
-          textAlign: "center",
-          justifySelf: "center",
-          marginTop: "100px", }}>
+          style={{
+            display: "",
+            textAlign: "center",
+            justifySelf: "center",
+            marginTop: "100px",
+          }}>
           {message}
         </Alert>
       )}

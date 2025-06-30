@@ -39,6 +39,9 @@ export interface LoginData {
 
 export interface LoginResponse {
   data: {
+    id: string,
+    name: string;
+    email: string;
     accesstoken: {
       token: string;
     };
