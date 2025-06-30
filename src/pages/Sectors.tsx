@@ -20,6 +20,7 @@ import {
 } from "@material-ui/core";
 import DeleteIcon from "@material-ui/icons/Delete";
 import { api } from "../utils/API";
+import { useAppSelector } from "../store/hook";
 
 interface Sector {
   id: string;
@@ -46,7 +47,7 @@ const Sectors: React.FC = () => {
 
   const currentUserJson = localStorage.getItem("currentUser");
   const currentUser = currentUserJson ? JSON.parse(currentUserJson) : null;
-  const isAdmin = currentUser?.isAdmin === 1;
+  const isAdmin = useAppSelector((state) => state.user.isAdmin);
 
   useEffect(() => {
     api
@@ -113,20 +114,25 @@ const Sectors: React.FC = () => {
   };
   return (
     <Box>
-      <Box display="flex" justifyContent="space-between" mb={2}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        mb={2}
+        style={{ padding: "10px" }}
+      >
         <Typography variant="h5" style={{ padding: 16 }}>
           Setores
         </Typography>
-        {
+        {isAdmin === 1 && (
           <Button
             variant="contained"
             color="primary"
             onClick={openCreateModal}
             style={{ margin: 4 }}
           >
-            + Novo Setor
+            + Novo
           </Button>
-        }
+        )}
       </Box>
 
       <TableContainer component={Paper}>
@@ -135,8 +141,8 @@ const Sectors: React.FC = () => {
             <TableRow>
               <TableCell>Nome</TableCell>
               <TableCell>Descrição</TableCell>
-              <TableCell>Cor</TableCell>
-              {/* isAdmin && */ <TableCell>Ações</TableCell>}
+              <TableCell>Cor para identificação do setor</TableCell>
+              {isAdmin === 1 && <TableCell>Ações</TableCell>}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -154,8 +160,8 @@ const Sectors: React.FC = () => {
                     }}
                   />
                 </TableCell>
-                {
-                  /* isAdmin && */ <TableCell>
+                {isAdmin === 1 && (
+                  <TableCell>
                     <Button size="small" onClick={() => openEditModal(sec)}>
                       Editar
                     </Button>
@@ -167,7 +173,7 @@ const Sectors: React.FC = () => {
                       <DeleteIcon fontSize="small" />
                     </IconButton>
                   </TableCell>
-                }
+                )}
               </TableRow>
             ))}
           </TableBody>
@@ -191,7 +197,6 @@ const Sectors: React.FC = () => {
         </DialogActions>
       </Dialog>
 
-      {/* Modal de criação/edição */}
       <Dialog
         open={modalOpen}
         onClose={() => setModalOpen(false)}
@@ -230,7 +235,7 @@ const Sectors: React.FC = () => {
               onChange={(e) =>
                 setFormData({ ...formData, color: e.target.value })
               }
-              fullWidth
+              style={{ width: "18px" }}
             />
           </Box>
         </DialogContent>

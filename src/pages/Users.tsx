@@ -26,6 +26,7 @@ import {
 import DeleteIcon from "@material-ui/icons/Delete";
 import { mockUsers } from "../../UserData";
 import { api } from "../utils/API";
+import { useAppSelector } from "../store/hook";
 
 interface Sector {
   id: string;
@@ -44,8 +45,6 @@ interface User {
 const Users: React.FC = () => {
   const [users, setUsers] = useState<User[]>(mockUsers);
   const [sectors, setSectors] = useState<Sector[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [formData, setFormData] = useState({
@@ -57,20 +56,13 @@ const Users: React.FC = () => {
   });
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
-
-  const currentUserJson = localStorage.getItem("currentUser"); 
-
-  let isAdmin = true
+  const isAdmin = useAppSelector((state) => state.user.isAdmin);
   useEffect(() => {
-      api
-        .get<{ data: Sector[] }>("/sectors")
-        .then((res) => setSectors(res.data.data))
-        .catch(() => setSectors([]));
     api
-      .get<{ data: User[] }>("/users")
-      .then((res) => setUsers(res.data.data))
-      .catch((err) => setError(err.message || "Erro ao carregar usuários"))
-      .finally(() => setLoading(false));
+      .get<{ data: Sector[] }>("/sectors")
+      .then((res) => setSectors(res.data.data))
+      .catch(() => setSectors([]));
+    api.get<{ data: User[] }>("/users").then((res) => setUsers(res.data.data));
   }, []);
 
   const refreshUsers = () => {
@@ -101,7 +93,6 @@ const Users: React.FC = () => {
     setModalOpen(true);
   };
 
-  // Abre diálogo de confirmação antes de deletar
   const openDeleteDialog = (id: string) => {
     setDeleteTargetId(id);
     setDeleteDialogOpen(true);
@@ -111,9 +102,8 @@ const Users: React.FC = () => {
     setDeleteDialogOpen(false);
 
     if (deleteTargetId) {
-      await api.patch(`/users/change-status/${deleteTargetId}`).then((res) =>{
-        if(res.status.valueOf() === 204){
-          console.log("atualizado com sucesso")
+      await api.patch(`/users/change-status/${deleteTargetId}`).then((res) => {
+        if (res.status.valueOf() === 204) {
         }
       });
       refreshUsers();
@@ -144,7 +134,7 @@ const Users: React.FC = () => {
           userId: editingUser.id,
           name: formData.name,
           sectorId: formData.sectorId,
-      };
+        };
         await api.put(`users/updateUser`, payloadUpdate);
       } else {
         await api.post(`/users`, payload);
@@ -158,18 +148,23 @@ const Users: React.FC = () => {
 
   return (
     <Box>
-      <Box display="flex" justifyContent="space-between" mb={2}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        mb={2}
+        style={{ padding: "10px" }}
+      >
         <Typography variant="h5" style={{ padding: 16 }}>
           Usuários
         </Typography>
-        {isAdmin && (
+        {isAdmin === 1 && (
           <Button
             variant="contained"
             color="primary"
             onClick={openCreateModal}
-            style={{ marginLeft: "4px" }}
+            style={{ margin: 4 }}
           >
-            + Novo Usuário
+            + Novo
           </Button>
         )}
       </Box>
@@ -180,7 +175,7 @@ const Users: React.FC = () => {
               <TableCell>Nome</TableCell>
               <TableCell>E-mail</TableCell>
               <TableCell>Setor</TableCell>
-              {isAdmin && <TableCell>Ações</TableCell>}
+              {isAdmin === 1 && <TableCell>Ações</TableCell>}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -198,7 +193,7 @@ const Users: React.FC = () => {
                     size="small"
                   />
                 </TableCell>
-                {isAdmin && (
+                {isAdmin === 1 && (
                   <TableCell>
                     <Button size="small" onClick={() => openEditModal(user)}>
                       Editar
@@ -218,7 +213,6 @@ const Users: React.FC = () => {
         </Table>
       </TableContainer>
 
-      {/* Diálogo de confirmação de exclusão */}
       <Dialog open={deleteDialogOpen} onClose={handleDeleteCancel}>
         <DialogTitle>Confirmar exclusão</DialogTitle>
         <DialogContent>

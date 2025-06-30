@@ -38,7 +38,6 @@ export const TicketBoard: React.FC = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [activeColumn, setActiveColumn] = useState<string>("");
 
-  // Carrega colunas com tickets embutidos
   const loadColumns = async () => {
     try {
       const res = await api.get<{ data: BoardColumn[] }>("/columns");
@@ -71,7 +70,6 @@ export const TicketBoard: React.FC = () => {
     position: number;
   }) => {
     try {
-      // inclui coluna atual no payload
       await api.post("/tickets", { ...data, columnId: activeColumn });
       await loadColumns();
     } catch (error) {
@@ -86,7 +84,6 @@ export const TicketBoard: React.FC = () => {
     toColumnId: string,
     toIndex: number
   ) => {
-    // Atualiza localmente apenas para resposta visual imediata
     setColumns((cols) =>
       cols.map((col) => {
         if (col.id === fromColumnId) {
@@ -109,7 +106,6 @@ export const TicketBoard: React.FC = () => {
       })
     );
 
-    // Persiste no backend: atualiza columnId e posição
     try {
       await api.patch(`/tickets/${ticketId}`, {
         columnId: toColumnId,
