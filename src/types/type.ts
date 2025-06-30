@@ -51,3 +51,26 @@ export interface MeResponse {
     isAdmin: string,
   }
 }
+
+export interface ListUserResponse {
+  data: {
+    id: string;
+    name: string;
+    email: string;
+    isAdmin: boolean;
+    sectors: {
+      id: string;
+      name: string;
+      color: string;
+    }
+  }[];
+}
+
+export interface ShowUserResponse {
+  data: {
+    id: string;
+    name: string;
+    email: string;
+    isAdmin: boolean;
+  }
+}
