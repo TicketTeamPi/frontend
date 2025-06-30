@@ -4,6 +4,7 @@ import Register from "./pages/Register";
 import { TicketBoard } from "./pages/TicketBoard";
 import PrivateLayout from "./contextConfig/PrivateLayout";
 import NotFound from "./pages/NotFound";
+import { Users } from "./pages/Users";
 
 export const AppRoutes = () => {
   return (
@@ -18,7 +19,7 @@ export const AppRoutes = () => {
         <Route path="/ticket" index element={<TicketBoard />} />
         <Route path="/ticketSector" element={<TicketBoard />} />
         <Route path="myTickets" element={<TicketBoard />} />
-        <Route path="users" element={<p>teste</p>} />
+        <Route path="users" element={<Users />} />
       </Route>
     </Routes>
   );

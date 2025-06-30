@@ -9,6 +9,8 @@ import type { BoardColumn, Ticket } from "src/types/type";
 import { ColumnHeader } from "../components/ColumnHeader";
 import { ColumnList } from "../components/ColumnList";
 import { ColumnFooter } from "../components/ColumnFooter";
+import { api } from "../utils/API";
+import { TicketModal } from "../components/TicketModal";
 
 const useStyles = makeStyles((theme) => ({
   root: { display: "flex", height: "100%" },
@@ -34,9 +36,38 @@ const useStyles = makeStyles((theme) => ({
 }));
 export const TicketBoard: React.FC = () => {
   const classes = useStyles();
-  // agora é um array de colunas
   const [columns, setColumns] = useState<BoardColumn[]>(defaultTasks.data);
+  useEffect(() => {
+    setColumns(defaultTasks.data);
+  }, []);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [activeColumn, setActiveColumn] = useState<string>("");
+  const handleAddClick = (columnId: string) => {
+    setActiveColumn(columnId);
+    setModalOpen(true);
+  };
 
+  const handleModalClose = () => {
+    setModalOpen(false);
+  };
+
+  const handleModalSubmit = async (data: {
+    title: string;
+    description: string;
+    status?: string;
+    columnId?: string;
+    sectorId?: string;
+    eta?: string;
+    position: number;
+  }) => {
+    try {
+      await api.post("/tickets", data);
+      console.log("Ticket criado:", data);
+    } catch (error) {
+      console.error("Erro ao criar ticket:", error);
+    }
+    setModalOpen(false);
+  };
   const handleTicketDrop = (
     ticketId: string,
     fromColumnId: string,
@@ -89,10 +120,19 @@ export const TicketBoard: React.FC = () => {
               columnKey={col.id}
             />
             <Divider className={classes.divider} />
-            <ColumnFooter />
+            <ColumnFooter onAdd={() => handleAddClick(col.id)} />{" "}
           </Paper>
         ))}
       </Grid>
+      <TicketModal
+        open={modalOpen}
+        onClose={handleModalClose}
+        onSubmit={handleModalSubmit}
+        columnId={activeColumn}
+        position={
+          columns.find((c) => c.id === activeColumn)?.tickets.length || 0
+        }
+      />
     </Grid>
   );
 };
