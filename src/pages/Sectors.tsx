@@ -10,115 +10,85 @@ import {
   TableContainer,
   Paper,
   Typography,
-  Chip,
   Button,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   IconButton,
 } from "@material-ui/core";
 import DeleteIcon from "@material-ui/icons/Delete";
-import { mockUsers } from "../../UserData";
 import { api } from "../utils/API";
 
 interface Sector {
   id: string;
   name: string;
+  description: string;
   color: string | null;
 }
 
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  isAdmin: number;
-  sector: Sector;
-}
-
-const Users: React.FC = () => {
-  const [users, setUsers] = useState<User[]>(mockUsers);
+const Sectors: React.FC = () => {
   const [sectors, setSectors] = useState<Sector[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
   const [modalOpen, setModalOpen] = useState(false);
-  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [editing, setEditing] = useState<Sector | null>(null);
   const [formData, setFormData] = useState({
     name: "",
-    email: "",
-    password: "",
-    isAdmin: 0,
-    sectorId: "",
+    description: "",
+    color: "#000000",
   });
+
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
 
   const currentUserJson = localStorage.getItem("currentUser");
-  const currentUser: User | null = currentUserJson
-    ? JSON.parse(currentUserJson)
-    : null;
+  const currentUser = currentUserJson ? JSON.parse(currentUserJson) : null;
   const isAdmin = currentUser?.isAdmin === 1;
 
   useEffect(() => {
-    if (isAdmin) {
-      api
-        .get<{ data: Sector[] }>("/sectors")
-        .then((res) => setSectors(res.data.data))
-        .catch(() => setSectors([]));
-    }
     api
-      .get<{ data: User[] }>("/users")
-      .then((res) => setUsers(res.data.data))
-      .catch((err) => setError(err.message || "Erro ao carregar usuários"))
+      .get<{ data: Sector[] }>("/sectors")
+      .then((res) => setSectors(res.data.data))
+      .catch((err) => setError(err.message || "Erro ao carregar setores"))
       .finally(() => setLoading(false));
   }, []);
 
-  const refreshUsers = () => {
-    api.get<{ data: User[] }>("/users").then((res) => setUsers(res.data.data));
+  const refresh = () => {
+    api
+      .get<{ data: Sector[] }>("/sectors")
+      .then((res) => setSectors(res.data.data));
   };
 
   const openCreateModal = () => {
-    setEditingUser(null);
+    setEditing(null);
+    setFormData({ name: "", description: "", color: "#000000" });
+    setModalOpen(true);
+  };
+
+  const openEditModal = (sector: Sector) => {
+    setEditing(sector);
     setFormData({
-      name: "",
-      email: "",
-      password: "",
-      isAdmin: 0,
-      sectorId: "",
+      name: sector.name,
+      description: sector.description,
+      color: sector.color ?? "#000000",
     });
     setModalOpen(true);
   };
 
-  const openEditModal = (user: User) => {
-    setEditingUser(user);
-    setFormData({
-      name: user.name,
-      email: user.email,
-      password: "",
-      isAdmin: user.isAdmin,
-      sectorId: user.sector.id,
-    });
-    setModalOpen(true);
-  };
-
-  // Abre diálogo de confirmação antes de deletar
   const openDeleteDialog = (id: string) => {
     setDeleteTargetId(id);
     setDeleteDialogOpen(true);
   };
 
   const handleDeleteConfirm = async () => {
-    setDeleteDialogOpen(false);
-
     if (deleteTargetId) {
-      await api.delete(`/users/${deleteTargetId}`);
-      refreshUsers();
+      await api.delete(`/sectors/${deleteTargetId}`);
+      refresh();
     }
+    setDeleteDialogOpen(false);
     setDeleteTargetId(null);
   };
 
@@ -128,79 +98,71 @@ const Users: React.FC = () => {
   };
 
   const handleSubmit = async () => {
-    try {
-      const payload: any = {
-        name: formData.name,
-        email: formData.email,
-        isAdmin: formData.isAdmin,
-        sectorId: formData.sectorId,
-      };
-      if (!editingUser && formData.password) {
-        payload.password = formData.password;
-      }
-
-      if (editingUser) {
-        await api.put(`/users/${editingUser.id}`, payload);
-      } else {
-        await api.post(`/users`, payload);
-      }
-      refreshUsers();
-      setModalOpen(false);
-    } catch (err) {
-      console.error(err);
+    const payload = {
+      name: formData.name,
+      description: formData.description,
+      color: formData.color,
+    };
+    if (editing) {
+      await api.put(`/sectors/${editing.id}`, payload);
+    } else {
+      await api.post(`/sectors`, payload);
     }
+    refresh();
+    setModalOpen(false);
   };
 
   return (
     <Box>
       <Box display="flex" justifyContent="space-between" mb={2}>
         <Typography variant="h5" style={{ padding: 16 }}>
-          Usuários
+          Setores
         </Typography>
-        {isAdmin && (
+        {
           <Button
             variant="contained"
             color="primary"
             onClick={openCreateModal}
-            style={{ marginLeft: "4px" }}
+            style={{ margin: 4 }}
           >
-            + Novo Usuário
+            + Novo Setor
           </Button>
-        )}
+        }
       </Box>
+
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
               <TableCell>Nome</TableCell>
-              <TableCell>E-mail</TableCell>
-              <TableCell>Setor</TableCell>
+              <TableCell>Descrição</TableCell>
+              <TableCell>Cor</TableCell>
               {isAdmin && <TableCell>Ações</TableCell>}
             </TableRow>
           </TableHead>
           <TableBody>
-            {users.map((user) => (
-              <TableRow key={user.id} hover>
-                <TableCell>{user.name}</TableCell>
-                <TableCell>{user.email}</TableCell>
+            {sectors.map((sec) => (
+              <TableRow key={sec.id} hover>
+                <TableCell>{sec.name}</TableCell>
+                <TableCell>{sec.description}</TableCell>
                 <TableCell>
-                  <Chip
-                    label={user.sector.name}
+                  <Box
+                    width={24}
+                    height={24}
                     style={{
-                      backgroundColor: user.sector.color ?? undefined,
-                      color: "#fff",
+                      backgroundColor: sec.color ?? "#000000",
+                      borderRadius: 4,
                     }}
-                    size="small"
                   />
                 </TableCell>
                 {isAdmin && (
                   <TableCell>
-                    <Button size="small" onClick={() => openEditModal(user)}>
+                    <Button size="small" onClick={() => openEditModal(sec)}>
                       Editar
                     </Button>
                     <IconButton
                       size="small"
-                      onClick={() => openDeleteDialog(user.id)}
+                      onClick={() => openDeleteDialog(sec.id)}
                       style={{ marginLeft: 8 }}
                     >
                       <DeleteIcon fontSize="small" />
@@ -213,11 +175,10 @@ const Users: React.FC = () => {
         </Table>
       </TableContainer>
 
-      {/* Diálogo de confirmação de exclusão */}
       <Dialog open={deleteDialogOpen} onClose={handleDeleteCancel}>
         <DialogTitle>Confirmar exclusão</DialogTitle>
         <DialogContent>
-          <Typography>Deseja realmente deletar este usuário?</Typography>
+          <Typography>Deseja realmente deletar este setor?</Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDeleteCancel}>Cancelar</Button>
@@ -231,15 +192,14 @@ const Users: React.FC = () => {
         </DialogActions>
       </Dialog>
 
+      {/* Modal de criação/edição */}
       <Dialog
         open={modalOpen}
         onClose={() => setModalOpen(false)}
         fullWidth
         maxWidth="sm"
       >
-        <DialogTitle>
-          {editingUser ? "Editar Usuário" : "Novo Usuário"}
-        </DialogTitle>
+        <DialogTitle>{editing ? "Editar Setor" : "Novo Setor"}</DialogTitle>
         <DialogContent>
           <Box mb={2}>
             <TextField
@@ -253,50 +213,32 @@ const Users: React.FC = () => {
           </Box>
           <Box mb={2}>
             <TextField
-              label="E-mail"
-              value={formData.email}
+              label="Descrição"
+              value={formData.description}
               onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value })
+                setFormData({ ...formData, description: e.target.value })
+              }
+              fullWidth
+              multiline
+              rows={3}
+            />
+          </Box>
+          <Box mb={2}>
+            <TextField
+              label="Cor"
+              type="color"
+              value={formData.color}
+              onChange={(e) =>
+                setFormData({ ...formData, color: e.target.value })
               }
               fullWidth
             />
-          </Box>
-          {!editingUser && (
-            <Box mb={2}>
-              <TextField
-                label="Senha"
-                type="password"
-                value={formData.password}
-                onChange={(e) =>
-                  setFormData({ ...formData, password: e.target.value })
-                }
-                fullWidth
-              />
-            </Box>
-          )}
-          <Box mb={2}>
-            <FormControl fullWidth>
-              <InputLabel>Setor</InputLabel>
-              <Select
-                value={formData.sectorId}
-                onChange={(e) =>
-                  setFormData({ ...formData, sectorId: String(e.target.value) })
-                }
-                label="Setor"
-              >
-                {sectors.map((s) => (
-                  <MenuItem key={s.id} value={s.id}>
-                    {s.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
           </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setModalOpen(false)}>Cancelar</Button>
           <Button onClick={handleSubmit} variant="contained" color="primary">
-            {editingUser ? "Salvar" : "Criar"}
+            {editing ? "Salvar" : "Criar"}
           </Button>
         </DialogActions>
       </Dialog>
@@ -304,4 +246,4 @@ const Users: React.FC = () => {
   );
 };
 
-export default Users;
+export default Sectors;

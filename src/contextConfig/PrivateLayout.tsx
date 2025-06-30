@@ -12,7 +12,7 @@ import Logout from "@mui/icons-material/Logout";
 import { Divider, Stack } from "@mui/material";
 import { ReactRouterAppProvider } from "@toolpad/core/react-router";
 import { Outlet } from "react-router";
-
+import ApartmentIcon from "@mui/icons-material/Apartment";
 const navigation: Navigation = [
   { kind: "header", title: "Tickets" },
   {
@@ -21,20 +21,20 @@ const navigation: Navigation = [
     icon: <DashboardOutlinedIcon />,
   },
   {
-    segment: "ticketSector",
-    title: "Tickets - Setornome",
-    icon: <DashboardOutlinedIcon />,
-  },
-  {
     segment: "myTickets",
     title: "Meus tickets",
     icon: <DashboardOutlinedIcon />,
   },
-  { kind: "header", title: "Usuários" },
+  { kind: "header", title: "Informações" },
   {
     segment: "users",
     title: "Usuários",
     icon: <PeopleOutlineOutlined />,
+  },
+  {
+    segment: "sectors",
+    title: "Setores",
+    icon: <ApartmentIcon />,
   },
 ];
 
@@ -42,7 +42,6 @@ const demoSession = {
   user: {
     name: "Bharat Kashyap",
     email: "bharatkashyap@outlook.com",
-    image: "https://avatars.githubusercontent.com/u/19550456",
   },
 };
 

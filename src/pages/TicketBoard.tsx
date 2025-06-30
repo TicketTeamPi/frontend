@@ -1,16 +1,13 @@
-"use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Grid, Paper, Divider } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
-
-import defaultTasks from "../../Tasks";
 import type { BoardColumn, Ticket } from "src/types/type";
 import { ColumnHeader } from "../components/ColumnHeader";
 import { ColumnList } from "../components/ColumnList";
 import { ColumnFooter } from "../components/ColumnFooter";
 import { api } from "../utils/API";
 import { TicketModal } from "../components/TicketModal";
+import defaultTasks from "../../Tasks";
 
 const useStyles = makeStyles((theme) => ({
   root: { display: "flex", height: "100%" },
@@ -34,14 +31,27 @@ const useStyles = makeStyles((theme) => ({
   },
   divider: { marginTop: theme.spacing(2) },
 }));
+
 export const TicketBoard: React.FC = () => {
   const classes = useStyles();
-  const [columns, setColumns] = useState<BoardColumn[]>(defaultTasks.data);
-  useEffect(() => {
-    setColumns(defaultTasks.data);
-  }, []);
+  const [columns, setColumns] = useState<BoardColumn[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [activeColumn, setActiveColumn] = useState<string>("");
+
+  // Carrega colunas com tickets embutidos
+  const loadColumns = async () => {
+    try {
+      const res = await api.get<{ data: BoardColumn[] }>("/columns");
+      setColumns(res.data.data);
+    } catch (err) {
+      console.error("Erro ao carregar colunas:", err);
+    }
+  };
+
+  useEffect(() => {
+    loadColumns();
+  }, []);
+
   const handleAddClick = (columnId: string) => {
     setActiveColumn(columnId);
     setModalOpen(true);
@@ -61,66 +71,70 @@ export const TicketBoard: React.FC = () => {
     position: number;
   }) => {
     try {
-      await api.post("/tickets", data);
-      console.log("Ticket criado:", data);
+      // inclui coluna atual no payload
+      await api.post("/tickets", { ...data, columnId: activeColumn });
+      await loadColumns();
     } catch (error) {
       console.error("Erro ao criar ticket:", error);
     }
     setModalOpen(false);
   };
-  const handleTicketDrop = (
+
+  const handleTicketDrop = async (
     ticketId: string,
     fromColumnId: string,
     toColumnId: string,
     toIndex: number
   ) => {
-    setColumns((cols) => {
-      // captura ticket movido antes de alterar qualquer coluna
-      const sourceCol = cols.find((c) => c.id === fromColumnId);
-      const movedTicket = sourceCol?.tickets.find((t) => t.id === ticketId);
-
-      return cols.map((col) => {
-        // mesmo coluna: apenas reordena
-        if (col.id === fromColumnId && fromColumnId === toColumnId) {
-          const newTickets = [...col.tickets];
-          const oldIndex = newTickets.findIndex((t) => t.id === ticketId);
-          if (oldIndex > -1) {
-            const [removed] = newTickets.splice(oldIndex, 1);
-            newTickets.splice(toIndex, 0, removed);
-          }
-          return { ...col, tickets: newTickets };
-        }
-        // coluna de origem: remove o ticket
+    // Atualiza localmente apenas para resposta visual imediata
+    setColumns((cols) =>
+      cols.map((col) => {
         if (col.id === fromColumnId) {
           return {
             ...col,
             tickets: col.tickets.filter((t) => t.id !== ticketId),
           };
         }
-        // coluna de destino: insere na posição desejada
-        if (col.id === toColumnId && movedTicket) {
-          const newTickets = [...col.tickets];
-          newTickets.splice(toIndex, 0, movedTicket);
+        if (col.id === toColumnId) {
+          const moved = columns
+            .find((c) => c.id === fromColumnId)
+            ?.tickets.find((t) => t.id === ticketId);
+          const newTickets = moved
+            ? [...col.tickets.filter((t) => t.id !== ticketId)]
+            : col.tickets;
+          if (moved) newTickets.splice(toIndex, 0, moved);
           return { ...col, tickets: newTickets };
         }
         return col;
+      })
+    );
+
+    // Persiste no backend: atualiza columnId e posição
+    try {
+      await api.patch(`/tickets/${ticketId}`, {
+        columnId: toColumnId,
+        position: toIndex,
       });
-    });
+      await loadColumns();
+    } catch (err) {
+      console.error("Erro ao atualizar ticket:", err);
+    }
   };
+
   return (
     <Grid container className={classes.root}>
       <Grid container wrap="nowrap" className={classes.callWrap}>
-        {columns.map((col) => (
+        {defaultTasks.data.map((col) => (
           <Paper key={col.id} elevation={1} className={classes.boardCard}>
             <ColumnHeader title={col.name} />
             <Divider />
             <ColumnList
               calls={col.tickets}
-              onTicketDrop={handleTicketDrop}
               columnKey={col.id}
+              onTicketDrop={handleTicketDrop}
             />
             <Divider className={classes.divider} />
-            <ColumnFooter onAdd={() => handleAddClick(col.id)} />{" "}
+            <ColumnFooter onAdd={() => handleAddClick(col.id)} />
           </Paper>
         ))}
       </Grid>

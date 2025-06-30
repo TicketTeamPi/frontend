@@ -4,7 +4,8 @@ import Register from "./pages/Register";
 import { TicketBoard } from "./pages/TicketBoard";
 import PrivateLayout from "./contextConfig/PrivateLayout";
 import NotFound from "./pages/NotFound";
-import { Users } from "./pages/Users";
+import Users from "./pages/Users";
+import Sectors from "./pages/Sectors";
 
 export const AppRoutes = () => {
   return (
@@ -17,9 +18,9 @@ export const AppRoutes = () => {
       </Route>
       <Route path="/" element={<PrivateLayout />}>
         <Route path="/ticket" index element={<TicketBoard />} />
-        <Route path="/ticketSector" element={<TicketBoard />} />
         <Route path="myTickets" element={<TicketBoard />} />
         <Route path="users" element={<Users />} />
+        <Route path="sectors" element={<Sectors />} />
       </Route>
     </Routes>
   );
