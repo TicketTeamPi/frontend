@@ -21,3 +21,33 @@ export interface BoardColumn {
 export interface BoardResponse {
   data: BoardColumn[];
 }
+
+export interface RegisterData {
+  name: string,
+  userName: string,
+  cnpj: string,
+  phone: string,
+  email: string,
+  password: string
+}
+
+export interface LoginData {
+  email: string,
+  password: string,
+}
+
+export interface LoginResponse {
+  data: {
+    accesstoken: {
+      token: string
+    }
+  }
+}
+
+export interface MeResponse {
+  data: {
+    name: string,
+    email: string,
+    isAdmin: string,
+  }
+}

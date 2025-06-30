@@ -2,23 +2,45 @@ import React, { useState } from "react";
 import {
   Button,
   Grid,
-  OutlinedInput,
   Paper,
   TextField,
   Typography,
 } from "@mui/material";
-import { Alert, FormControl, useFormControl } from "@mui/material";
-import type { RegisterInput } from "src/types/type";
+import { Alert } from "@mui/material";
+import type { RegisterData } from "src/types/type";
+import { authService } from "../services/authService";
+
 const Register: React.FC = () => {
-  const [form, setForm] = useState<RegisterInput>({
+  const [success, setSuccess] = useState<boolean>(false);
+  const [error, setError] = useState<boolean>(false);
+  const [message, setMessage] = useState<string>("");
+
+  const [form, setForm] = useState<RegisterData>({
     name: "",
+    userName: "",
     cnpj: "",
     email: "",
     password: "",
+    phone: "",
   });
+
   const handleSubmit = () => {
-    console.log(form);
+    authService
+      .register(form)
+      .then((response) => {
+        setSuccess(true);
+        setError(false);
+        setMessage(response.data.message || "Empresa cadastrada com sucesso!");
+      })
+      .catch((err) => {
+        setSuccess(false);
+        setError(true);
+        const msg = err.response?.data?.errors[0].message || "Erro ao cadastrar a empresa.";
+        setMessage(msg);
+        console.error("Erro:", msg);
+      });
   };
+
   return (
     <>
       <Grid
@@ -28,19 +50,16 @@ const Register: React.FC = () => {
         minHeight={"96vh"}
         maxHeight={"96vh"}
       >
-        {form.password && (
-          <Alert
-            style={{
-              display: "",
-              textAlign: "center",
-              justifySelf: "center",
-              marginTop: "10px",
-            }}
-          >
-            {" "}
-            Empresa cadastrada com sucesso!
-          </Alert>
-        )}
+        {success && (
+        <Alert severity="success" style={{ 
+          display: "",
+          textAlign: "center",
+          justifySelf: "center",
+          marginTop: "100px", }}>
+          {message}
+        </Alert>
+      )}
+
         <Paper
           variant="outlined"
           style={{
@@ -84,11 +103,23 @@ const Register: React.FC = () => {
             <Grid justifySelf={"center"} size={12}>
               <TextField
                 id="name"
+                label="Nome da empresa"
+                placeholder="Inserir nome da empresa."
+                style={{ minWidth: "400px" }}
+                onBlur={(e) => {
+                  setForm({ ...form, name: e.target.value });
+                }}
+                required
+              />
+            </Grid>
+            <Grid justifySelf={"center"} size={12}>
+              <TextField
+                id="name"
                 label="Nome"
                 placeholder="Inserir nome."
                 style={{ minWidth: "400px" }}
                 onBlur={(e) => {
-                  setForm({ ...form, name: e.target.value });
+                  setForm({ ...form, userName: e.target.value });
                 }}
                 required
               />
@@ -113,6 +144,18 @@ const Register: React.FC = () => {
                 style={{ minWidth: "400px" }}
                 onBlur={(e) => {
                   setForm({ ...form, email: e.target.value });
+                }}
+                required
+              />
+            </Grid>
+            <Grid justifySelf={"center"} size={12}>
+              <TextField
+                id="phone"
+                label="Telefone"
+                placeholder="Inserir telefone."
+                style={{ minWidth: "400px" }}
+                onBlur={(e) => {
+                  setForm({ ...form, phone: e.target.value });
                 }}
                 required
               />
