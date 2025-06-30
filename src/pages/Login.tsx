@@ -1,8 +1,44 @@
-import React from "react";
-import { Button, Grid, Paper, TextField, Typography } from "@mui/material";
+import React, { useState } from "react";
+import { Alert, Button, fabClasses, Grid, Paper, TextField, Typography } from "@mui/material";
+import type { LoginData, LoginResponse } from "../types/type";
+import { authService } from "../services/authService";
+import type { AxiosResponse } from "axios";
+
 const Login: React.FC = () => {
+  const [error, setError] = useState<boolean>(false)
+  const [message, setMessage] = useState<string>('')
+  const [form, setForm] = useState<LoginData>({
+    email: '',
+    password: ''
+  })
+
+  const handleSubmit = () => {
+    authService.login(form)
+      .then((response:AxiosResponse<LoginResponse>) => {
+        const token = response.data.data.accesstoken.token
+  
+        localStorage.setItem('auth-token', token)
+        setError(false)
+        window.location.replace("/ticket");
+      })
+      .catch((error: any) => {
+        setMessage('Ocorreu um erro ao fazer login') 
+        setError(true)
+      })
+  }
+
   return (
     <Grid gap={2} display={"grid"} alignContent={"center"} minHeight={"96vh"}>
+      {error && (
+        <Alert severity="error"
+          style={{ 
+          display: "",
+          textAlign: "center",
+          justifySelf: "center",
+          marginTop: "100px", }}>
+          {message}
+        </Alert>
+      )}
       <Paper
         variant="outlined"
         style={{
@@ -45,20 +81,26 @@ const Login: React.FC = () => {
           </Grid>
           <Grid justifySelf={"center"} size={12}>
             <TextField
-              id="outlined-uncontrolled"
-              label="E-mail"
-              placeholder="Inserir e-mail."
+              id="email"
+              label="Email"
+              placeholder="Inserir seu email"
               style={{ minWidth: "400px" }}
+              onBlur={(e) => {
+                setForm({ ...form, email: e.target.value });
+              }}
               required
             />
           </Grid>
           <Grid justifySelf={"center"} size={12}>
             <TextField
-              id="outlined-uncontrolled"
+              id="password"
               label="Senha"
-              placeholder="Inserir senha."
-              required
+              placeholder="Inserir sua senha"
               style={{ minWidth: "400px" }}
+              onBlur={(e) => {
+                setForm({ ...form, password: e.target.value });
+              }}
+              required
             />
           </Grid>
           <Grid justifySelf={"center"} size={12}>
@@ -75,7 +117,7 @@ const Login: React.FC = () => {
               variant="contained"
               style={{ width: "100%" }}
               onClick={() => {
-                window.location.replace("/ticket");
+                handleSubmit()
               }}
             >
               Entrar
