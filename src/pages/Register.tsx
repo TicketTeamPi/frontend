@@ -8,9 +8,8 @@ import {
   Typography,
 } from "@mui/material";
 import { Alert, FormControl, useFormControl } from "@mui/material";
-import type { RegisterInput } from "src/types/type";
 const Register: React.FC = () => {
-  const [form, setForm] = useState<RegisterInput>({
+  const [form, setForm] = useState({
     name: "",
     cnpj: "",
     email: "",

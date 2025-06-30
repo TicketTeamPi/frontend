@@ -1,4 +1,3 @@
-// src/pages/TicketBoard.tsx
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import { Grid, Paper, Divider } from "@material-ui/core";
@@ -44,28 +43,38 @@ export const TicketBoard: React.FC = () => {
     toColumnId: string,
     toIndex: number
   ) => {
-    if (fromColumnId === toColumnId) return;
-    setColumns((cols) =>
-      cols.map((col) => {
-        // remove de origem
+    setColumns((cols) => {
+      // captura ticket movido antes de alterar qualquer coluna
+      const sourceCol = cols.find((c) => c.id === fromColumnId);
+      const movedTicket = sourceCol?.tickets.find((t) => t.id === ticketId);
+
+      return cols.map((col) => {
+        // mesmo coluna: apenas reordena
+        if (col.id === fromColumnId && fromColumnId === toColumnId) {
+          const newTickets = [...col.tickets];
+          const oldIndex = newTickets.findIndex((t) => t.id === ticketId);
+          if (oldIndex > -1) {
+            const [removed] = newTickets.splice(oldIndex, 1);
+            newTickets.splice(toIndex, 0, removed);
+          }
+          return { ...col, tickets: newTickets };
+        }
+        // coluna de origem: remove o ticket
         if (col.id === fromColumnId) {
           return {
             ...col,
             tickets: col.tickets.filter((t) => t.id !== ticketId),
           };
         }
-        // adiciona em destino
-        if (col.id === toColumnId) {
-          const sourceCol = cols.find((c) => c.id === fromColumnId);
-          const moved = sourceCol?.tickets.find((t) => t.id === ticketId);
-          if (!moved) return col;
+        // coluna de destino: insere na posição desejada
+        if (col.id === toColumnId && movedTicket) {
           const newTickets = [...col.tickets];
-          newTickets.splice(toIndex, 0, moved);
+          newTickets.splice(toIndex, 0, movedTicket);
           return { ...col, tickets: newTickets };
         }
         return col;
-      })
-    );
+      });
+    });
   };
   return (
     <Grid container className={classes.root}>

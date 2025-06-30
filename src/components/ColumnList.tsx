@@ -1,5 +1,5 @@
 // src/components/ColumnList.tsx
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState } from "react";
 import { Grid, makeStyles } from "@material-ui/core";
 import { Column } from "./Column";
 import type { Ticket } from "src/types/type";
@@ -33,11 +33,6 @@ export const ColumnList: React.FC<ColumnListProps> = ({
   const classes = useStyles();
   const containerRef = useRef<HTMLDivElement>(null);
   const [isHovering, setIsHovering] = useState(false);
-  const [dragCounter, setDragCounter] = useState(0);
-  useEffect(() => {
-    setIsHovering(dragCounter > 0);
-  }, [dragCounter]);
-  // drop handler no container, calcula índice de inserção baseado em distância ao centro dos cards
   const handleContainerDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsHovering(false);
@@ -45,7 +40,6 @@ export const ColumnList: React.FC<ColumnListProps> = ({
     if (!data) return;
     const { ticketId, fromColumnId } = JSON.parse(data);
 
-    // busca todos os wrappers de card
     const nodes = Array.from(
       containerRef.current?.querySelectorAll<HTMLDivElement>("[data-index]") ||
         []
@@ -69,16 +63,24 @@ export const ColumnList: React.FC<ColumnListProps> = ({
       spacing={1}
       className={classes.columnContent}
       ref={containerRef}
-      onDragOver={(e) => e.preventDefault()}
-      onDragEnter={(e) => {
+      onDragOver={(e) => {
         e.preventDefault();
-        setDragCounter((c) => c + 1);
+        if (!isHovering) setIsHovering(true);
+      }}
+      onDragEnter={(e) => {
+        if (e.target === e.currentTarget) {
+          e.preventDefault();
+          setIsHovering(true);
+        }
       }}
       onDragLeave={(e) => {
-        e.preventDefault();
-        setDragCounter((c) => c - 1);
+        if (e.target === e.currentTarget) {
+          e.preventDefault();
+          setIsHovering(false);
+        }
       }}
       onDrop={(e) => {
+        setIsHovering(false);
         handleContainerDrop(e);
       }}
       style={
@@ -93,6 +95,7 @@ export const ColumnList: React.FC<ColumnListProps> = ({
             onDrop={(e: React.DragEvent) => {
               e.preventDefault();
               e.stopPropagation();
+              setIsHovering(false);
               const data = e.dataTransfer.getData("text/plain");
               if (!data) return;
               const { ticketId, fromColumnId } = JSON.parse(data);
@@ -107,7 +110,11 @@ export const ColumnList: React.FC<ColumnListProps> = ({
               onTicketDrop(ticketId, fromColumnId, columnKey, newIndex);
             }}
           >
-            <Column ticket={ticket} columnKey={columnKey} />
+            <Column
+              ticket={ticket}
+              columnKey={columnKey}
+              onDragEnd={() => setIsHovering(false)}
+            />
           </div>
         </Grid>
       ))}

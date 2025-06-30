@@ -32,7 +32,7 @@ const navigation: Navigation = [
   },
   { kind: "header", title: "Usuários" },
   {
-    segment: "lord-of-the-rings",
+    segment: "users",
     title: "Usuários",
     icon: <PeopleOutlineOutlined />,
   },

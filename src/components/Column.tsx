@@ -30,8 +30,13 @@ const useStyles = makeStyles((theme) => ({
 interface ColumnProps {
   ticket: Ticket;
   columnKey: string;
+  onDragEnd?: (e: React.DragEvent) => void;
 }
-export const Column: React.FC<ColumnProps> = ({ ticket, columnKey }) => {
+export const Column: React.FC<ColumnProps> = ({
+  ticket,
+  columnKey,
+  onDragEnd,
+}) => {
   const classes = useStyles();
   const handleDragStart = (e: React.DragEvent) => {
     e.dataTransfer.setData(
@@ -45,6 +50,7 @@ export const Column: React.FC<ColumnProps> = ({ ticket, columnKey }) => {
       variant="outlined"
       draggable
       onDragStart={handleDragStart}
+      onDragEnd={onDragEnd}
       style={{ borderLeft: `5px solid ${ticket.sector.color}` }}
     >
       <div className={classes.details}>

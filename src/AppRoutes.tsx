@@ -18,6 +18,7 @@ export const AppRoutes = () => {
         <Route path="/ticket" index element={<TicketBoard />} />
         <Route path="/ticketSector" element={<TicketBoard />} />
         <Route path="myTickets" element={<TicketBoard />} />
+        <Route path="users" element={<p>teste</p>} />
       </Route>
     </Routes>
   );
