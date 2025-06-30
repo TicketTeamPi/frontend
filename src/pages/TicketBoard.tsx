@@ -34,7 +34,7 @@ const useStyles = makeStyles((theme) => ({
 
 export const TicketBoard: React.FC = () => {
   const classes = useStyles();
-  const [columns, setColumns] = useState<BoardColumn[]>([defaultTasks]);
+  const [columns, setColumns] = useState<BoardColumn[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [activeColumn, setActiveColumn] = useState<string>("");
 

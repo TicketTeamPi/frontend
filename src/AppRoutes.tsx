@@ -10,10 +10,9 @@ import Sectors from "./pages/Sectors";
 export const AppRoutes = () => {
   return (
     <Routes>
-      
       <Route index path="/login" element={<Login />} />
       <Route path="/sign" element={<Register />} />
-      
+
       <Route path="*" element={<NotFound />} />
       <Route path="/" element={<PrivateLayout />}>
         <Route path="/ticket" element={<TicketBoard />} />

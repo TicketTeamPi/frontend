@@ -11,6 +11,7 @@ import { Alert } from "@mui/material";
 import type { RegisterData } from "src/types/type";
 import { authService } from "../services/authService";
 import { api } from "../utils/API";
+import { useNavigate } from "react-router";
 
 const Register: React.FC = () => {
   const [success, setSuccess] = useState<boolean>(false);
@@ -27,11 +28,23 @@ const Register: React.FC = () => {
   });
 
   const handleSubmit = () => {
-    api.post("/register", {...form}).then((res) => {
-      if(res.status.valueOf() === 200){
-        setMessage('empresa cadastrada com sucesso!')
-      }
-    })
+    api
+      .post("/register", { ...form })
+      .then((res) => {
+        if (res.status === 200) {
+          setMessage("empresa cadastrada com sucesso!");
+          setError(false);
+          return;
+        }
+      })
+      .catch((err) => {
+        setError(true);
+        if (err.status === 422) {
+          setMessage("Preencha os campos!");
+          return;
+        }
+        setMessage("Erro ao cadastrar empresa");
+      });
   };
 
   return (
@@ -43,16 +56,16 @@ const Register: React.FC = () => {
         // minHeight={"96vh"}
         // maxHeight={"100vh"}
       >
-        {message === "empresa cadastrada com sucesso!" &&(
+        {message && (
           <Alert
+            severity={error ? "error" : "success"}
             style={{
               textAlign: "center",
               justifySelf: "center",
               marginTop: "10px",
             }}
           >
-            {" "}
-            Empresa cadastrada com sucesso!
+            {message}
           </Alert>
         )}
         <Paper
@@ -159,6 +172,7 @@ const Register: React.FC = () => {
               <TextField
                 id="password"
                 label="Senha"
+                type="password"
                 placeholder="Inserir senha."
                 required
                 onBlur={(e) => {

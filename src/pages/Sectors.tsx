@@ -53,7 +53,7 @@ const Sectors: React.FC = () => {
       .get<{ data: Sector[] }>("/sectors")
       .then((res) => setSectors(res.data.data))
       .catch((err) => setError(err.message || "Erro ao carregar setores"))
-      .finally(() => setLoading(false))
+      .finally(() => setLoading(false));
   }, []);
 
   const refresh = () => {
@@ -148,14 +148,14 @@ const Sectors: React.FC = () => {
                   <Box
                     style={{
                       backgroundColor: sec.color ?? "#000000",
-                      height: '14px',
-                      width: '14px',
+                      height: "14px",
+                      width: "14px",
                       borderRadius: 20,
                     }}
                   />
                 </TableCell>
-                {/* isAdmin && */ (
-                  <TableCell>
+                {
+                  /* isAdmin && */ <TableCell>
                     <Button size="small" onClick={() => openEditModal(sec)}>
                       Editar
                     </Button>
@@ -167,7 +167,7 @@ const Sectors: React.FC = () => {
                       <DeleteIcon fontSize="small" />
                     </IconButton>
                   </TableCell>
-                )}
+                }
               </TableRow>
             ))}
           </TableBody>

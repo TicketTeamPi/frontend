@@ -1,5 +1,13 @@
 import React, { useState } from "react";
-import { Alert, Button, fabClasses, Grid, Paper, TextField, Typography } from "@mui/material";
+import {
+  Alert,
+  Button,
+  fabClasses,
+  Grid,
+  Paper,
+  TextField,
+  Typography,
+} from "@mui/material";
 import type { LoginData, LoginResponse } from "../types/type";
 import { useNavigate } from "react-router";
 import { authService } from "../services/authService";
@@ -8,45 +16,50 @@ import { useAppDispatch } from "../store/hook";
 import { login } from "../store/userReducer";
 
 const Login: React.FC = () => {
-  const [error, setError] = useState<boolean>(false)
-  const [message, setMessage] = useState<string>('')
+  const [error, setError] = useState<boolean>(false);
+  const [message, setMessage] = useState<string>("");
   const [form, setForm] = useState<LoginData>({
-    email: '',
-    password: ''
-  })
+    email: "",
+    password: "",
+  });
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   const handleSubmit = () => {
-    authService.login(form)
+    authService
+      .login(form)
       .then((response: AxiosResponse<LoginResponse>) => {
-        const token = response.data.data.accesstoken.token
+        const token = response.data.data.accesstoken.token;
         if (response.data) {
-          
-          console.log("login",  response.data)
-          dispatch(login(response.data.data))
+          dispatch(login(response.data.data));
+          localStorage.setItem("auth-token", token);
+          navigate("/ticket");
+          setError(false);
+          return;
         }
-
-        localStorage.setItem('auth-token', token)
-        setError(false)
-        navigate("/ticket");
       })
-      .catch((error: any) => {
-        setMessage('Ocorreu um erro ao fazer login')
-        setError(true)
-      })
-  }
+      .catch((error) => {
+        setError(true);
+        if (error.status === 400) {
+          setMessage("Credenciais inválidas!");
+          return;
+        }
+        setMessage("Ocorreu um erro ao fazer login");
+      });
+  };
 
   return (
     <Grid gap={2} display={"grid"} alignContent={"center"} minHeight={"96vh"}>
       {error && (
-        <Alert severity="error"
+        <Alert
+          severity="error"
           style={{
             display: "",
             textAlign: "center",
             justifySelf: "center",
             marginTop: "100px",
-          }}>
+          }}
+        >
           {message}
         </Alert>
       )}
@@ -106,6 +119,7 @@ const Login: React.FC = () => {
             <TextField
               id="password"
               label="Senha"
+              type="password"
               placeholder="Inserir sua senha"
               style={{ minWidth: "400px" }}
               onBlur={(e) => {
@@ -128,7 +142,7 @@ const Login: React.FC = () => {
               variant="contained"
               style={{ width: "100%" }}
               onClick={() => {
-                handleSubmit()
+                handleSubmit();
               }}
             >
               Entrar

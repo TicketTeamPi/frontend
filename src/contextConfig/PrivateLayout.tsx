@@ -16,6 +16,8 @@ import ApartmentIcon from "@mui/icons-material/Apartment";
 import { useAppSelector } from "../store/hook";
 import { api } from "../utils/API";
 import type { MeResponse } from "src/types/type";
+import { useDispatch } from "react-redux";
+import { login } from "../store/userReducer";
 const navigation: Navigation = [
   { kind: "header", title: "Tickets" },
   {
@@ -41,13 +43,7 @@ const navigation: Navigation = [
   },
 ];
 
-
-
-const CustomToolbarActions: React.FC = () => (
-  <Stack direction="row" alignItems="center">
-    <ThemeSwitcher />
-  </Stack>
-);
+const CustomToolbarActions: React.FC = () => <></>;
 
 const SidebarFooterAccount: React.FC<SidebarFooterProps> = ({ mini }) => (
   <Stack direction="column" p={0}>
@@ -71,16 +67,20 @@ const SidebarFooterAccount: React.FC<SidebarFooterProps> = ({ mini }) => (
     />
   </Stack>
 );
-interface MeResponseSession extends Omit<MeResponse['data'], 'isAdmin'> { }
+interface MeResponseSession extends Omit<MeResponse["data"], "isAdmin"> {}
 const PrivateRoute: React.FC = () => {
-  const [users, setUser] = useState<MeResponseSession>()
-  const userRef = useAppSelector((state) => state.user )
+  const userRef = useAppSelector((state) => state.user);
+  const dispatch = useDispatch();
   useEffect(() => {
-    console.log(userRef)
-  }, [userRef])
+    api.get("/me").then((res) => {
+      if (res.data) {
+        dispatch(login(res.data));
+      }
+    });
+  }, [userRef]);
   const session = {
     user: {
-     ...users
+      ...userRef,
     },
   };
   const authentication = useMemo(
@@ -89,9 +89,8 @@ const PrivateRoute: React.FC = () => {
         return;
       },
       signOut: async () => {
-        await api.delete('/logout')
+        await api.delete("/logout");
         window.location.replace("/login");
-
       },
     }),
     []
