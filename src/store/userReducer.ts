@@ -11,6 +11,7 @@ interface UserState {
   };
   isAuthenticated?: boolean;
   isAdmin?: number;
+  sector_id: string | null;
 }
 
 const initialState: UserState = {
@@ -23,6 +24,7 @@ const initialState: UserState = {
   },
   isAuthenticated: false,
   isAdmin: 0,
+        sector_id: null
 };
 
 const userSlice = createSlice({
@@ -35,6 +37,7 @@ const userSlice = createSlice({
       state.email = action.payload.email;
       state.name = action.payload.name;
       state.isAdmin = action.payload.isAdmin;
+            state.sector_id = action.payload.sector_id
     },
     resetUser(state) {
       state = initialState;

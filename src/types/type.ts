@@ -45,6 +45,7 @@ export interface LoginResponse {
     accesstoken: {
       token: string;
     };
+    sector_id: string;
   };
 }
 

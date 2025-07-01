@@ -39,17 +39,28 @@ export const TicketBoard: React.FC = () => {
   const [activeColumn, setActiveColumn] = useState<string>("");
 
   const loadColumns = async () => {
-    try {
-      const res = await api.get<{ data: BoardColumn[] }>("/columns");
-      setColumns(res.data.data);
-    } catch (err) {
-      console.error("Erro ao carregar colunas:", err);
-    }
-  };
+  try {
+    const res = await api.get<{ data: BoardColumn[] }>("/columns");
+    // Ordena os tickets de cada coluna pelo campo position
+    const orderedColumns = res.data.data.map((col) => ({
+      ...col,
+      tickets: [...col.tickets].sort((a, b) => (a.position ?? 0) - (b.position ?? 0)),
+    }));
+    setColumns(orderedColumns);
+  } catch (err) {
+    console.error("Erro ao carregar colunas:", err);
+  }
+};
 
   useEffect(() => {
-    loadColumns();
-  }, []);
+  api.get<{ data: BoardColumn[] }>("/columns").then((res) => {
+    const orderedColumns = res.data.data.map((col) => ({
+      ...col,
+      tickets: [...col.tickets].sort((a, b) => (a.position ?? 0) - (b.position ?? 0)),
+    }));
+    setColumns(orderedColumns);
+  });
+}, []);
 
   const handleAddClick = (columnId: string) => {
     setActiveColumn(columnId);
@@ -105,10 +116,61 @@ export const TicketBoard: React.FC = () => {
         return col;
       })
     );
+    // Atualiza localmente apenas para resposta visual imediata
+   setColumns((cols) =>
+    cols.map((col) => {
+      // Movendo dentro da mesma coluna
+      if (col.id === fromColumnId && col.id === toColumnId) {
+        const oldIndex = col.tickets.findIndex((t) => t.id === ticketId);
+        if (oldIndex === -1) return col;
+        const updatedTickets = [...col.tickets];
+        const [movedTicket] = updatedTickets.splice(oldIndex, 1);
+        // Se mover para baixo, o array já está menor, então ajusta o índice
+        let insertAt = toIndex;
+        if (oldIndex < toIndex) insertAt = toIndex;
+        updatedTickets.splice(insertAt, 0, movedTicket);
+        // Atualiza as posições
+        const ticketsWithPosition = updatedTickets.map((t, idx) => ({
+          ...t,
+          position: idx,
+        }));
+        return { ...col, tickets: ticketsWithPosition };
+      }
+      // Remover da coluna de origem
+      if (col.id === fromColumnId) {
+        return {
+          ...col,
+          tickets: col.tickets.filter((t) => t.id !== ticketId).map((t, idx) => ({
+            ...t,
+            position: idx,
+          })),
+        };
+      }
+      // Adicionar na coluna de destino
+      if (col.id === toColumnId) {
+        // Busca o ticket movido na coluna de origem
+        const moved = cols
+          .find((c) => c.id === fromColumnId)
+          ?.tickets.find((t) => t.id === ticketId);
+        if (!moved) return col;
+        const newTickets = [...col.tickets];
+        newTickets.splice(toIndex, 0, moved);
+        // Atualiza as posições
+        const ticketsWithPosition = newTickets.map((t, idx) => ({
+          ...t,
+          position: idx,
+        }));
+        return { ...col, tickets: ticketsWithPosition };
+      }
+      return col;
+    })
+  );
 
     try {
-      await api.patch(`/tickets/${ticketId}`, {
-        columnId: toColumnId,
+      await api.put(`/columns/reorganize`, {
+        columnIdFrom: fromColumnId,
+        columnIdTo: toColumnId === fromColumnId ? null : toColumnId,
+        ticketId: ticketId,
         position: toIndex,
       });
       await loadColumns();

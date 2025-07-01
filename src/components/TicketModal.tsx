@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import {
   Dialog,
@@ -7,7 +7,12 @@ import {
   DialogActions,
   Button,
   TextField,
+  Select,
+  InputLabel,
 } from "@material-ui/core";
+import { Box, FormControl, MenuItem } from "@mui/material";
+import { api } from "../utils/API";
+import { useAppSelector } from "../store/hook";
 
 interface TicketModalProps {
   open: boolean;
@@ -15,11 +20,18 @@ interface TicketModalProps {
   onSubmit: (data: {
     title: string;
     description: string;
+    sectorId: string;
     columnId?: string;
     position: number;
   }) => void;
   columnId: string;
   position: number;
+}
+
+interface Sector {
+  id: string;
+  name: string;
+  color: string | null;
 }
 
 export const TicketModal: React.FC<TicketModalProps> = ({
@@ -31,6 +43,17 @@ export const TicketModal: React.FC<TicketModalProps> = ({
 }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [sector, setSectors] = useState<Sector[]>([]);
+  const userRef = useAppSelector((state) => state.user)
+  const [selectedSectorId, setSelectedSectorId] = useState<string>("");
+
+  let isAdmin = false
+
+useEffect(() => {
+   api.get<{ data: Sector[] }>("/sectors")
+        .then((res) => setSectors(res.data.data))
+        .catch(() => setSectors([]));
+})
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -38,12 +61,15 @@ export const TicketModal: React.FC<TicketModalProps> = ({
       title,
       description,
       columnId,
+      sectorId: isAdmin ? selectedSectorId : userRef.sector_id!,
       position,
     });
     setTitle("");
     setDescription("");
     onClose();
   };
+
+  
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
@@ -70,6 +96,26 @@ export const TicketModal: React.FC<TicketModalProps> = ({
             rows={3}
             style={{ marginTop: 16 }}
           />
+          {isAdmin && (
+            <Box mb={2}>
+           <FormControl fullWidth>
+              <InputLabel>Setor</InputLabel>
+              <Select
+                value={selectedSectorId}
+                onChange={(e) =>
+                  setSelectedSectorId(e.target.value as string)
+                }
+                label="Setor"
+              >
+                {sector.map((s) => (
+                  <MenuItem key={s.id} value={s.id}>
+                    {s.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            </Box>
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose}>Cancelar</Button>
