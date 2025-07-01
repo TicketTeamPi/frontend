@@ -102,8 +102,9 @@ export const TicketDetailModal: React.FC<TicketDetailModalProps> = ({
         </Typography>
       </DialogContent>
       <DialogActions sx={{ justifyContent: "space-between" }}>
-  {isCreator || user.sector_id === '0197b7c1-dde3-7397-95bd-46b0174750ba' && (
+  {(isCreator || user.sector_id === '0197b7c1-dde3-7397-95bd-46b0174750ba') && (
     <Button
+      className="primary-button"
       color="error"
       onClick={handleDelete}
       variant="contained"
@@ -113,7 +114,7 @@ export const TicketDetailModal: React.FC<TicketDetailModalProps> = ({
     </Button>
   )}
   <Box>
-    <Button onClick={onClose} variant="outlined">
+    <Button onClick={onClose} variant="outlined" className="primary-button">
       Cancelar
     </Button>
     {(user.sector_id === ticket.sector.id || user.sector_id === '0197b7c1-dde3-7397-95bd-46b0174750ba') && (

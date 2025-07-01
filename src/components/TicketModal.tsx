@@ -108,7 +108,7 @@ useEffect(() => {
                 label="Setor"
               >
                 {sector.map((s) => (
-                  <MenuItem key={s.id} value={s.id}>
+                  <MenuItem key={s.id} value={s.id} >
                     {s.name} 
                   </MenuItem>
                 ))}

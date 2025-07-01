@@ -102,7 +102,7 @@ const PrivateRoute: React.FC = () => {
       navigation={navigation}
       session={session}
       authentication={authentication}
-      branding={{
+        branding={{
         logo: (
           <img
             src="src/assets/icons/ticketTool.svg"

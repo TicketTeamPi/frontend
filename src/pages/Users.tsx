@@ -162,7 +162,7 @@ const Users: React.FC = () => {
             variant="contained"
             color="primary"
             onClick={openCreateModal}
-            style={{ margin: 4 }}
+            className="primary-button"
           >
             + Novo
           </Button>
