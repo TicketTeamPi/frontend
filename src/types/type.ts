@@ -1,4 +1,5 @@
 export interface Sector {
+  id: string;
   name: string;
   color: string;
 }
@@ -6,10 +7,14 @@ export interface Sector {
 export interface Ticket {
   id: string;
   title: string;
+  description?: string;
+  createdBy?: string;
+  createdAt?: string;
+  userCreator: string;
   position?: number;
   priority: string | null;
-  userId: string;
   responsibleId: string | null;
+  responsibleName: string | null;
   sector: Sector;
 }
 

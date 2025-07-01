@@ -147,7 +147,7 @@ const Users: React.FC = () => {
   };
 
   return (
-    <Box>
+    <Box style={{ height: "100%" }}>
       <Box
         display="flex"
         justifyContent="space-between"

@@ -45,8 +45,6 @@ const Sectors: React.FC = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
 
-  const currentUserJson = localStorage.getItem("currentUser");
-  const currentUser = currentUserJson ? JSON.parse(currentUserJson) : null;
   const isAdmin = useAppSelector((state) => state.user.isAdmin);
 
   useEffect(() => {

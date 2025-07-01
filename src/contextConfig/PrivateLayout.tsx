@@ -17,17 +17,14 @@ import { useAppSelector } from "../store/hook";
 import { api } from "../utils/API";
 import type { MeResponse } from "src/types/type";
 import { useDispatch } from "react-redux";
-import { login } from "../store/userReducer";
+import { login, resetUser } from "../store/userReducer";
+import Unauthorized from "../components/Unauthorized ";
+
 const navigation: Navigation = [
-  { kind: "header", title: "Tickets" },
+  { kind: "header", title: "Principal" },
   {
     segment: "ticket",
-    title: "Todos os tickets",
-    icon: <DashboardOutlinedIcon />,
-  },
-  {
-    segment: "myTickets",
-    title: "Meus tickets",
+    title: "Tickets",
     icon: <DashboardOutlinedIcon />,
   },
   { kind: "header", title: "Informações" },
@@ -91,11 +88,15 @@ const PrivateRoute: React.FC = () => {
       signOut: async () => {
         await api.delete("/logout");
         window.location.replace("/login");
+        dispatch(resetUser())
       },
     }),
     []
   );
-
+  (userRef)
+  if(userRef.email === null){
+    return (<Unauthorized/>)
+  }
   return (
     <ReactRouterAppProvider
       navigation={navigation}

@@ -46,14 +46,13 @@ export const TicketModal: React.FC<TicketModalProps> = ({
   const [sector, setSectors] = useState<Sector[]>([]);
   const userRef = useAppSelector((state) => state.user)
   const [selectedSectorId, setSelectedSectorId] = useState<string>("");
-
-  let isAdmin = false
+  const isAdmin = useAppSelector((state) => state.user.isAdmin)
 
 useEffect(() => {
    api.get<{ data: Sector[] }>("/sectors")
         .then((res) => setSectors(res.data.data))
         .catch(() => setSectors([]));
-})
+}, [])
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -69,7 +68,8 @@ useEffect(() => {
     onClose();
   };
 
-  
+    const user = useAppSelector((state) => state.user);
+
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
@@ -96,7 +96,7 @@ useEffect(() => {
             rows={3}
             style={{ marginTop: 16 }}
           />
-          {isAdmin && (
+          {(isAdmin || user.sector_id === '0197b7c1-dde3-7397-95bd-46b0174750ba') && (
             <Box mb={2}>
            <FormControl fullWidth>
               <InputLabel>Setor</InputLabel>
@@ -109,7 +109,7 @@ useEffect(() => {
               >
                 {sector.map((s) => (
                   <MenuItem key={s.id} value={s.id}>
-                    {s.name}
+                    {s.name} 
                   </MenuItem>
                 ))}
               </Select>
@@ -118,7 +118,7 @@ useEffect(() => {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={onClose}>Cancelar</Button>
+          <Button onClick={onClose} variant="outlined">Cancelar</Button>
           <Button type="submit" color="primary" variant="contained">
             Criar
           </Button>

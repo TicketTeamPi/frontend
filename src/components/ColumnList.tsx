@@ -23,12 +23,14 @@ interface ColumnListProps {
     toColumnId: string,
     toIndex: number
   ) => void;
+  onTicketClick?: (ticketId: string) => void;
 }
 
 export const ColumnList: React.FC<ColumnListProps> = ({
   calls,
   columnKey,
   onTicketDrop,
+  onTicketClick,
 }) => {
   const classes = useStyles();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -114,6 +116,7 @@ export const ColumnList: React.FC<ColumnListProps> = ({
               ticket={ticket}
               columnKey={columnKey}
               onDragEnd={() => setIsHovering(false)}
+              onClick={() => onTicketClick && onTicketClick(ticket.id)}
             />
           </div>
         </Grid>

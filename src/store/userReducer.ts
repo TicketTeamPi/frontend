@@ -37,14 +37,14 @@ const userSlice = createSlice({
       state.email = action.payload.email;
       state.name = action.payload.name;
       state.isAdmin = action.payload.isAdmin;
-            state.sector_id = action.payload.sector_id
+      state.sector_id = action.payload.sector_id
     },
-    resetUser(state) {
+    resetUser: (state) => {
       state = initialState;
     },
   },
 });
 
-export const { login } = userSlice.actions;
+export const { login, resetUser } = userSlice.actions;
 
 export default userSlice.reducer;

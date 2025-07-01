@@ -9,6 +9,7 @@ import {
   makeStyles,
 } from "@material-ui/core";
 import type { Ticket } from "src/types/type";
+import { Avatar, AvatarGroup } from "@mui/material";
 
 const useStyles = makeStyles((theme) => ({
   cardRoot: {
@@ -31,11 +32,13 @@ interface ColumnProps {
   ticket: Ticket;
   columnKey: string;
   onDragEnd?: (e: React.DragEvent) => void;
+  onClick?: () => void;
 }
 export const Column: React.FC<ColumnProps> = ({
   ticket,
   columnKey,
   onDragEnd,
+  onClick,
 }) => {
   const classes = useStyles();
   const handleDragStart = (e: React.DragEvent) => {
@@ -51,6 +54,7 @@ export const Column: React.FC<ColumnProps> = ({
       draggable
       onDragStart={handleDragStart}
       onDragEnd={onDragEnd}
+      onClick={onClick}
       style={{ borderLeft: `5px solid ${ticket.sector.color}` }}
     >
       <div className={classes.details}>
@@ -58,7 +62,7 @@ export const Column: React.FC<ColumnProps> = ({
           <Typography variant="h6">{ticket.title}</Typography>
           <Box my={1} style={{ paddingBottom: "5px" }}>
             <Typography variant="body2">
-              Created-At: {ticket.sector.name}
+              {ticket.createdAt?.slice(0,10)}
             </Typography>
           </Box>
           <Chip

@@ -7,10 +7,12 @@ import { ColumnList } from "../components/ColumnList";
 import { ColumnFooter } from "../components/ColumnFooter";
 import { api } from "../utils/API";
 import { TicketModal } from "../components/TicketModal";
-import defaultTasks from "../../Tasks";
+import { TicketDetailModal } from "../components/TicketDetailModel";
+import { Box, Button, TextField } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add"
 
 const useStyles = makeStyles((theme) => ({
-  root: { display: "flex", height: "100%" },
+  root: { display: "flex", height: "100%", scrollbarWidth: "thin", },
   callWrap: {
     display: "flex",
     flex: "1 1 auto",
@@ -34,9 +36,25 @@ const useStyles = makeStyles((theme) => ({
 
 export const TicketBoard: React.FC = () => {
   const classes = useStyles();
+  const [detailModalOpen, setDetailModalOpen] = useState(false);
+  const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
   const [columns, setColumns] = useState<BoardColumn[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [activeColumn, setActiveColumn] = useState<string>("");
+  const [addingColumn, setAddingColumn] = useState(true);
+  const [newColumnName, setNewColumnName] = useState("");
+
+  const handleAddColumn = async () => {
+  if (!newColumnName.trim()) return;
+  try {
+    await api.post("/columns", { name: newColumnName });
+    setNewColumnName("");
+    setAddingColumn(false);
+    await loadColumns();
+  } catch (err) {
+    console.error("Erro ao criar coluna:", err);
+  }
+};
 
   const loadColumns = async () => {
   try {
@@ -61,6 +79,16 @@ export const TicketBoard: React.FC = () => {
     setColumns(orderedColumns);
   });
 }, []);
+
+  const handleTicketClick = async (ticketId: string) => {
+  try {
+    const res = await api.get(`/tickets/${ticketId}`);
+    setSelectedTicket(res.data);
+    setDetailModalOpen(true);
+  } catch (err) {
+    console.error("Erro ao buscar detalhes do ticket:", err);
+  }
+};
 
   const handleAddClick = (columnId: string) => {
     setActiveColumn(columnId);
@@ -168,12 +196,81 @@ export const TicketBoard: React.FC = () => {
               calls={col.tickets}
               columnKey={col.id}
               onTicketDrop={handleTicketDrop}
+              onTicketClick={handleTicketClick}
             />
             <Divider className={classes.divider} />
             <ColumnFooter onAdd={() => handleAddClick(col.id)} />
           </Paper>
         ))}
       </Grid>
+      <Paper
+  elevation={3}
+  style={{
+    minWidth: 250,
+    maxWidth: 300,
+    margin: "0 8px",
+    background: "#fff",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    boxShadow: "0 2px 8px 0 rgba(0,0,0,0.10)", // leve sombreado
+    height: 80,
+  }}
+>
+  {!addingColumn ? (
+    <Button
+      startIcon={<AddIcon/>}
+      onClick={() => setAddingColumn(true)}
+      style={{
+        color: "#111",
+        fontWeight: 500,
+        background: "rgba(0,0,0,0.03)",
+        boxShadow: "0 2px 8px 0 rgba(0,0,0,0.10)",
+        borderRadius: 8,
+        padding: "10px 16px",
+        textTransform: "none",
+      }}
+      fullWidth
+    >
+      + Adicionar outra lista
+    </Button>
+  ) : (
+    <Box display="flex" alignItems="center" width="100%" px={2}>
+      <TextField
+        value={newColumnName}
+        onChange={e => setNewColumnName(e.target.value)}
+        placeholder="Nome da lista..."
+        size="small"
+        variant="outlined"
+        autoFocus
+        style={{ background: "#fff", flex: 1 }}
+        InputProps={{
+          style: { color: "#111" }
+        }}
+        onKeyDown={e => {
+          if (e.key === "Enter") handleAddColumn();
+        }}
+      />
+      <Button
+        onClick={handleAddColumn}
+        color="primary"
+        variant="contained"
+        style={{ marginLeft: 8, minWidth: 40, minHeight: 40 }}
+      >
+        <AddIcon />
+      </Button>
+      <Button
+        onClick={() => {
+          setAddingColumn(false);
+          setNewColumnName("");
+        }}
+        style={{ marginLeft: 4, minWidth: 40, minHeight: 40 }}
+      >
+        X
+      </Button>
+    </Box>
+  )}
+</Paper>
       <TicketModal
         open={modalOpen}
         onClose={handleModalClose}
@@ -183,6 +280,13 @@ export const TicketBoard: React.FC = () => {
           columns.find((c) => c.id === activeColumn)?.tickets.length || 0
         }
       />
+      <TicketDetailModal
+      open={detailModalOpen}
+      onClose={() => setDetailModalOpen(false)}
+      ticket={selectedTicket}
+      onUpdate={loadColumns}
+    />
     </Grid>
+    
   );
 };
