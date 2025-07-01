@@ -95,28 +95,6 @@ export const TicketBoard: React.FC = () => {
     toColumnId: string,
     toIndex: number
   ) => {
-    setColumns((cols) =>
-      cols.map((col) => {
-        if (col.id === fromColumnId) {
-          return {
-            ...col,
-            tickets: col.tickets.filter((t) => t.id !== ticketId),
-          };
-        }
-        if (col.id === toColumnId) {
-          const moved = columns
-            .find((c) => c.id === fromColumnId)
-            ?.tickets.find((t) => t.id === ticketId);
-          const newTickets = moved
-            ? [...col.tickets.filter((t) => t.id !== ticketId)]
-            : col.tickets;
-          if (moved) newTickets.splice(toIndex, 0, moved);
-          return { ...col, tickets: newTickets };
-        }
-        return col;
-      })
-    );
-    // Atualiza localmente apenas para resposta visual imediata
    setColumns((cols) =>
     cols.map((col) => {
       // Movendo dentro da mesma coluna
