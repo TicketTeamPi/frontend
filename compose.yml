@@ -1,0 +1,15 @@
+#defino a versão do docker compose;
+version: "3.5"
+
+services:
+  frontend: #crio um serviço chamado 'frontend'
+    build:
+      context: ./src #em seu build atribui /src como contexto.
+    volumes:
+      - ./src:/app # Faço um bind: o diretório local ./src sincronizo com /app no container.
+      - /app/node_modules # Crio um volume anônimo para o diretório node_modules dentro do container.
+    ports:
+      - "5173:5173" # Mapeia a porta 5173 do container para a 5173 do host
+    environment:
+      - NODE_ENV=development # Defino a variável de ambiente NODE_ENV como "development" dentro do container
+    command: npm run dev -- --host # Comando que será executado ao iniciar o container
