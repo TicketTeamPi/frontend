@@ -28,7 +28,7 @@ WORKDIR /app
 RUN npm run build
 
 FROM node:20-alpine
-COPY ./package.json package-lock.json /src/
+COPY ../package.json package-lock.json /src/
 COPY --from=production-dependencies-env /src/node_modules /src/node_modules
 COPY --from=build-env /src/build /src/build
 #defino o diretório de trabalho remóto como /app
