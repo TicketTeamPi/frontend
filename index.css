@@ -1,0 +1,72 @@
+p {
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+}
+
+body {
+  height: inherit;
+  margin: 0;
+}
+
+#root {
+  height: inherit;
+}
+
+.text-main-color {
+  color: rgba(0, 0, 0, 0.38);
+  font-weight: 300;
+  text-align: center;
+}
+
+.logo-menu {
+  width: 70px;
+  border-radius: 40px;
+  opacity: 0.5;
+}
+
+[data-draggable] {
+  cursor: grab;
+}
+
+[data-drop-target-for] {
+  transition: background-color 0.15s ease-in-out;
+}
+
+[data-drop-target-for].drop-hovered {
+  background-color: rgba(33, 150, 243, 0.08);
+  border-radius: 8px;
+}
+
+[data-rbd-drag-handle-context-id] {
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.primary-button {
+  height: 36px;
+  align-self: center;
+}
+
+.MuiButtonBase-root {
+  color: inherit;
+  border: 0;
+  cursor: pointer;
+  margin: 0;
+  display: inline-flex;
+  outline: 0;
+  position: relative;
+  align-items: center;
+  user-select: none;
+  border-radius: 0;
+  vertical-align: middle;
+  -moz-appearance: none;
+  justify-content: center;
+  text-decoration: none;
+  background-color: transparent;
+  -webkit-appearance: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.dropdown {
+  display: flex;
+  flex-direction: column;
+  align-items: baseline;
+}
