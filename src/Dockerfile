@@ -14,6 +14,5 @@ FROM node:20-alpine
 #defino o diretório de trabalho remóto como /app
 WORKDIR /app
 COPY package*.json ./
-COPY --from=production-dependencies-env /app/node_modules ./node_modules
 COPY --from=build-env /app/dist ./dist
 CMD ["npm", "run", "start"]
