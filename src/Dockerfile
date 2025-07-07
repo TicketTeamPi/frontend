@@ -3,8 +3,6 @@
 FROM node:20-alpine AS build-env
 #defino o diretório de trabalho remóto como /app;
 WORKDIR /app
-#copio toda a imagem 'development-dependencies-env' e node_modules;
-COPY --from=development-dependencies-env /app/node_modules ./node_modules
 #copio tudo dentro de /src;
 COPY . .
 #executo comando npm run build;
