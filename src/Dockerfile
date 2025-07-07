@@ -5,6 +5,7 @@ COPY . /src
 #defino o diretório de trabalho remóto como /app;
 WORKDIR /app
 #executo comando npm ci;
+RUN npm install -g npm@latest
 RUN npm ci
 
 #defino a configuração da imagem docker que irie utilizar. e atribuo um alias;
