@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ticket-tool-frontend-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ticket-tool-frontend
+  template:
+    metadata:
+      labels:
+        app: ticket-tool-frontend
+    spec:
+      containers:
+        - name: frontend
+          image: gabrielfogo/ticket-tool-frontend:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: VITE_API_URL
+              value: "http://ticket-tool-api-service"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ticket-tool-frontend-service
+spec:
+  selector:
+    app: ticket-tool-frontend
+  ports:
+    - port: 80
+      targetPort: 3000
+      nodePort: 30080
+  type: NodePort
