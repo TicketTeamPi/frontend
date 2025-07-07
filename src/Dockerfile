@@ -9,11 +9,12 @@ RUN npm ci
 
 #defino a configuração da imagem docker que irie utilizar. e atribuo um alias;
 FROM node:20-alpine AS production-dependencies-env
-#copio o package.json e o package-lock e a src;
-COPY package*.json ./
 #defino o diretório de trabalho remóto como /app;
 WORKDIR /app
-#executo comando npm ci --omit=dev;
+#copio o package.json e o package-lock e a src;
+COPY package*.json ./
+#executo comando npm start;
+RUN npm install -g npm@latest
 RUN npm ci --omit=dev
 
 #defino a configuração da imagem docker que irie utilizar. e atribuo um alias;
